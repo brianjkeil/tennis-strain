@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennis Strain Monitor — Brian Keil</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --bg-tertiary: #efefec;
+    --text: #1a1a1a;
+    --text-secondary: #6b7280;
+    --border: rgba(0,0,0,0.10);
+    --border-md: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --red: #A32D2D;
+    --amber: #633806;
+    --amber-bg: #FAEEDA;
+    --amber-border: #EF9F27;
+    --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --bg-secondary: #161b22; --bg-tertiary: #21262d;
+      --text: #e2e8f0; --text-secondary: #8b949e;
+      --border: rgba(255,255,255,0.08); --border-md: rgba(255,255,255,0.14);
+      --blue: #63b3ed; --blue-light: rgba(99,179,237,0.12);
+      --green: #68d391; --green-light: rgba(104,211,145,0.12);
+      --red: #fc8181; --amber: #f6ad55;
+      --amber-bg: rgba(246,173,85,0.08); --amber-border: rgba(246,173,85,0.3);
+    }
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg-tertiary); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+  .app-shell { max-width: 980px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .header { padding: 24px 0 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .header-top { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+  .header-eyebrow { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .status-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-md); color: var(--text-secondary); background: var(--bg); }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+
+  .tab-bar { display: flex; gap: 2px; }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: -1px; font-family: inherit; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+  .pill { cursor: pointer; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid var(--border-md); color: var(--text-secondary); background: none; font-family: inherit; }
+  .pill.s.active { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .pill.d.active { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; display: block; }
+  input[type="text"], input[type="number"], input[type="date"] { width: 100%; padding: 8px 12px; font-size: 13px; border-radius: var(--radius-md); border: 1px solid var(--border-md); background: var(--bg); color: var(--text); font-family: inherit; outline: none; }
+  input:focus { border-color: var(--blue); }
+
+  .btn { padding: 8px 16px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-md); background: var(--bg-secondary); color: var(--text); font-family: inherit; }
+  .btn:hover { background: var(--bg-tertiary); }
+  .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .btn.primary:hover { opacity: 0.9; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+  .stat-val { font-size: 28px; font-weight: 600; font-family: var(--font-mono); line-height: 1; margin-bottom: 4px; }
+  .stat-sub { font-size: 12px; color: var(--text-secondary); }
+
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .legend { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .legend-box { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .legend-line { width: 16px; height: 2px; display: inline-block; border-radius: 1px; }
+
+  .session-grid { display: grid; grid-template-columns: 1fr 76px 76px 90px 32px; gap: 8px; align-items: center; }
+  .session-header { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 4px 8px; border-bottom: 1px solid var(--border); }
+  .session-row { padding: 9px 4px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .session-row:last-child { border-bottom: none; }
+
+  .tag-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .notice { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius-md); padding: 10px 14px; font-size: 12px; color: var(--amber); display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; }
+  .drop-zone { border: 2px dashed var(--border-md); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; cursor: pointer; margin-bottom: 14px; }
+  .drop-zone:hover { border-color: var(--blue); }
+
+  .threshold-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+  .threshold-inp { width: 58px; padding: 4px 8px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-md); background: var(--bg); color: var(--text); text-align: center; font-family: var(--font-mono); }
+
+  /* Setup tab */
+  .setup-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .setup-step:last-child { border-bottom: none; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+  code { font-family: var(--font-mono); font-size: 12px; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; word-break: break-all; }
+  .code-block { font-family: var(--font-mono); font-size: 12px; background: var(--bg-secondary); padding: 12px 14px; border-radius: var(--radius-md); line-height: 1.7; color: var(--text-secondary); margin-top: 8px; overflow-x: auto; white-space: pre; }
+  .sync-info { background: var(--green-light); border: 1px solid var(--green); border-radius: var(--radius-md); padding: 12px 16px; font-size: 13px; color: var(--green); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+  .flex { display: flex; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; }
+  .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; } .mb-20 { margin-bottom: 20px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col-form { display: flex; flex-direction: column; gap: 12px; }
+  .mono { font-family: var(--font-mono); } .text-secondary { color: var(--text-secondary); }
+  .text-red { color: var(--red); } .text-blue { color: var(--blue); } .text-green { color: var(--green); }
+  .hidden { display: none !important; }
+  .section-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .small-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+  .info-row { display: flex; gap: 10px; font-size: 12px; padding: 7px 0; border-top: 1px solid var(--border); }
+  .info-key { font-family: var(--font-mono); color: var(--blue); min-width: 160px; }
+  .info-val { color: var(--text-secondary); }
+
+  @media (max-width: 680px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .tab { padding: 8px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="header-eyebrow">Brian Keil · 2026</div>
+        <div class="header-title">Tennis Strain Monitor</div>
+      </div>
+      <div class="header-right">
+        <div class="status-pill">
+          <span class="status-dot" id="storage-dot"></span>
+          <span id="storage-status">Loading...</span>
+        </div>
+        <div class="status-pill" id="sync-badge" style="display:none;">
+          <span class="status-dot" style="background:#3B6D11;"></span>
+          <span id="sync-time">Synced</span>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
+      <button class="tab" onclick="showTab('log',this)">Log Session</button>
+      <button class="tab" onclick="showTab('import',this)">Import CSV</button>
+      <button class="tab" onclick="showTab('setup',this)">Auto-Sync Setup</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard">
+    <div class="flex gap-8 mb-20" style="align-items:center;flex-wrap:wrap;">
+      <button class="pill s active" id="pill-singles" onclick="setType('singles')">Singles</button>
+      <button class="pill d" id="pill-doubles" onclick="setType('doubles')">Doubles</button>
+      <div class="threshold-wrap">
+        Flag threshold:
+        <input type="number" class="threshold-inp" id="threshold-inp" value="15" min="1" max="21" step="0.5" oninput="renderDash()">
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Avg strain</div><div class="stat-val text-blue" id="s-avg">—</div><div class="stat-sub" id="s-count">0 sessions</div></div>
+      <div class="stat-card"><div class="stat-label">Peak strain</div><div class="stat-val text-red" id="s-peak">—</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card"><div class="stat-label">MTD avg</div><div class="stat-val text-blue" id="s-mtd">—</div><div class="stat-sub" id="s-mtd-count">0 this month</div></div>
+      <div class="stat-card"><div class="stat-label">High-strain flags</div><div class="stat-val text-red" id="s-flags">0</div><div class="stat-sub" id="s-flags-sub">above threshold</div></div>
+    </div>
+    <div class="charts-grid">
+      <div class="card">
+        <div class="label mb-8">Strain per session</div>
+        <canvas id="bar-chart" style="width:100%;height:130px;display:block;"></canvas>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-box" style="background:#378ADD;"></span> Normal</div>
+          <div class="legend-item"><span class="legend-box" style="background:#E24B4A;"></span> Above threshold</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label mb-8">Rolling averages</div>
+        <canvas id="line-chart" style="width:100%;height:130px;display:block;"></canvas>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-line" style="background:#378ADD;opacity:0.4;"></span> Sessions</div>
+          <div class="legend-item"><span class="legend-line" style="background:#EF9F27;"></span> 7-day avg</div>
+          <div class="legend-item"><span class="legend-line" style="background:#7F77DD;"></span> 30-day avg</div>
+        </div>
+      </div>
+    </div>
+    <div class="card mb-16">
+      <div class="label mb-12">Recent sessions — <span id="type-label">singles</span></div>
+      <div id="session-list"></div>
+    </div>
+    <div id="untagged-notice" class="notice hidden">
+      <span id="untagged-text"></span>
+      <button class="btn" style="font-size:12px;white-space:nowrap;" onclick="showTab('log',document.querySelectorAll('.tab')[1])">Tag now →</button>
+    </div>
+  </div>
+
+  <!-- LOG SESSION -->
+  <div id="tab-log" class="hidden">
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title">Log session manually</div>
+        <div class="col-form">
+          <div><span class="label">Date</span><input type="date" id="m-date" min="2026-01-01"></div>
+          <div><span class="label">Strain score</span><input type="number" id="m-strain" placeholder="e.g. 14.2" min="0" max="21" step="0.1"></div>
+          <div><span class="label">Recovery % (optional)</span><input type="number" id="m-recovery" placeholder="e.g. 72" min="0" max="100"></div>
+          <div>
+            <span class="label" style="margin-bottom:8px;">Session type</span>
+            <div class="flex gap-8">
+              <button class="pill s active" id="m-pill-s" style="flex:1;text-align:center;" onclick="setManualType('singles')">Singles</button>
+              <button class="pill d" id="m-pill-d" style="flex:1;text-align:center;" onclick="setManualType('doubles')">Doubles</button>
+            </div>
+          </div>
+          <button class="btn primary" onclick="addManual()">Add session</button>
+          <div id="manual-msg" style="font-size:12px;min-height:16px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Tag imported sessions</div>
+        <div class="small-title">Classify each 2026 tennis session as singles or doubles. Tags are saved permanently.</div>
+        <div id="tag-queue"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPORT CSV -->
+  <div id="tab-import" class="hidden" style="max-width:540px;">
+    <div class="card">
+      <div class="section-title">Import WHOOP CSV</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.6;">
+        Export from WHOOP: <strong>Profile → Export Data → Download CSV</strong>.<br>
+        Only Tennis sessions from 2026 onward are imported. Re-importing is safe — existing tags are never overwritten.
+      </p>
+      <label class="drop-zone">
+        <div style="font-size:14px;color:var(--blue);font-weight:500;margin-bottom:4px;">Click to select your WHOOP CSV</div>
+        <div style="font-size:12px;color:var(--text-secondary);">Tab-delimited .csv from WHOOP export</div>
+        <input type="file" accept=".csv,.tsv,.txt" style="display:none;" onchange="handleCSV(this)">
+      </label>
+      <div id="csv-msg" style="font-size:13px;margin-bottom:16px;min-height:20px;"></div>
+      <div class="card" style="background:var(--bg-secondary);">
+        <span class="label mb-8">What gets imported</span>
+        <div class="info-row"><span class="info-key">Workout start time</span><span class="info-val">Date — 2026 or later only</span></div>
+        <div class="info-row"><span class="info-key">Activity name</span><span class="info-val">Must contain "Tennis"</span></div>
+        <div class="info-row"><span class="info-key">Activity Strain</span><span class="info-val">Strain score for analytics</span></div>
+        <div class="info-row"><span class="info-key">Duration (min)</span><span class="info-val">Logged for reference</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTO-SYNC SETUP -->
+  <div id="tab-setup" class="hidden">
+    <div id="sync-status-banner" class="sync-info hidden">
+      <span>✓</span>
+      <span id="sync-status-text">Auto-sync is active. GitHub Actions syncs your WHOOP data every morning at 6am ET.</span>
+    </div>
+
+    <div class="two-col" style="align-items:start;">
+      <div class="card">
+        <div class="section-title">One-time setup</div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;line-height:1.6;">
+          Complete these steps once. After that, your WHOOP tennis sessions appear in the app automatically every morning — no CSV exports, no manual imports.
+        </p>
+
+        <div class="setup-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Get your initial refresh token via Postman</div>
+            <div class="step-desc">Download <strong>Postman</strong> (free at postman.com). Use it to complete the WHOOP OAuth flow once and capture your refresh token. Full instructions are in the right panel.</div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Add three secrets to your GitHub repo</div>
+            <div class="step-desc">Go to your repo on GitHub → <strong>Settings → Secrets and variables → Actions → New repository secret</strong>. Add these three:</div>
+            <div class="code-block">WHOOP_CLIENT_ID      → your Client ID
+WHOOP_CLIENT_SECRET  → your Client Secret
+WHOOP_REFRESH_TOKEN  → token from Postman</div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Upload the workflow file to your repo</div>
+            <div class="step-desc">In your GitHub repo, create the folder path <code>.github/workflows/</code> and upload <code>sync-whoop.yml</code> into it. GitHub will detect it automatically.</div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Run the workflow manually once to test</div>
+            <div class="step-desc">Go to your repo → <strong>Actions tab → Sync WHOOP Tennis Data → Run workflow</strong>. It should complete in under 30 seconds and commit a <code>data.json</code> file to your repo.</div>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Done — runs automatically every morning</div>
+            <div class="step-desc">GitHub Actions will sync at 6am ET daily. New tennis sessions appear in your app automatically. You only need to tag Singles vs Doubles for new sessions.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card mb-16">
+          <div class="section-title">Getting your refresh token via Postman</div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">Postman has a built-in OAuth flow that handles the browser redirect for you — no server needed for this one-time step.</p>
+
+          <div class="setup-step" style="padding:10px 0;">
+            <div class="step-num" style="width:22px;height:22px;font-size:11px;">1</div>
+            <div class="step-body"><div class="step-desc">Open Postman → New Collection → Authorization tab → Type: <strong>OAuth 2.0</strong></div></div>
+          </div>
+          <div class="setup-step" style="padding:10px 0;">
+            <div class="step-num" style="width:22px;height:22px;font-size:11px;">2</div>
+            <div class="step-body"><div class="step-desc">Fill in:<br>
+              Auth URL: <code>https://api.prod.whoop.com/oauth/oauth2/auth</code><br>
+              Token URL: <code>https://api.prod.whoop.com/oauth/oauth2/token</code><br>
+              Client ID: your Client ID<br>
+              Client Secret: your Client Secret<br>
+              Scope: <code>read:workout offline</code><br>
+              Redirect URI: <code>https://oauth.pstmn.io/v1/callback</code>
+            </div></div>
+          </div>
+          <div class="setup-step" style="padding:10px 0;">
+            <div class="step-num" style="width:22px;height:22px;font-size:11px;">3</div>
+            <div class="step-body"><div class="step-desc">Click <strong>Get New Access Token</strong> → log into WHOOP → authorize. Postman will show you the full token response.</div></div>
+          </div>
+          <div class="setup-step" style="padding:10px 0;border:none;">
+            <div class="step-num" style="width:22px;height:22px;font-size:11px;">4</div>
+            <div class="step-body"><div class="step-desc">Copy the <strong>refresh_token</strong> value from the response. That goes into GitHub Secrets as <code>WHOOP_REFRESH_TOKEN</code>.</div></div>
+          </div>
+        </div>
+
+        <div class="card" style="background:var(--amber-bg);border-color:var(--amber-border);">
+          <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px;">Note on refresh token rotation</div>
+          <div style="font-size:12px;color:var(--amber);line-height:1.6;">WHOOP rotates refresh tokens on each use. The GitHub Action handles this automatically — if the token rotates, a <code>new-refresh-token.txt</code> file appears in your repo. Copy that value and update the <code>WHOOP_REFRESH_TOKEN</code> secret. This rarely happens but worth knowing.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'bk-tennis-strain-PERMANENT';
+let sessions = [];
+let activeType = 'singles';
+let manualType = 'singles';
+let lastSync = null;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { sessions = JSON.parse(raw); }
+    else {
+      for (const k of ['bk-tennis-strain-v3','bk-tennis-strain-v2','bk-tennis-strain-v1']) {
+        const old = localStorage.getItem(k);
+        if (old) { sessions = JSON.parse(old); save(); ['bk-tennis-strain-v3','bk-tennis-strain-v2','bk-tennis-strain-v1'].forEach(ok => { try { localStorage.removeItem(ok); } catch(e) {} }); break; }
+      }
+    }
+  } catch(e) { sessions = []; }
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); updateStatus(); }
+  catch(e) { updateStatus(true); }
+}
+
+function updateStatus(err) {
+  const dot = document.getElementById('storage-dot');
+  const el = document.getElementById('storage-status');
+  if (!el) return;
+  if (err) { dot.style.background = '#E24B4A'; el.textContent = 'Storage error'; return; }
+  const tagged = sessions.filter(s => s.type !== null).length;
+  dot.style.background = '#3B6D11';
+  el.textContent = sessions.length + ' sessions · ' + tagged + ' tagged';
+}
+
+// Fetch data.json from GitHub Pages (same origin)
+async function fetchDataJson() {
+  try {
+    const resp = await fetch('data.json?t=' + Date.now());
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.sessions || !data.sessions.length) return;
+
+    lastSync = data.lastSync;
+
+    // Merge into localStorage — preserve existing tags
+    const existingMap = new Map(sessions.map(s => [s.id, s]));
+    let added = 0;
+    (data.sessions || []).forEach(s => {
+      if (!existingMap.has(s.id)) { existingMap.set(s.id, s); added++; }
+      // never overwrite — preserves type tags
+    });
+    if (added > 0) {
+      sessions = Array.from(existingMap.values());
+      save();
+    }
+
+    // Show sync badge
+    if (lastSync) {
+      const d = new Date(lastSync);
+      const badge = document.getElementById('sync-badge');
+      const syncTime = document.getElementById('sync-time');
+      badge.style.display = 'flex';
+      syncTime.textContent = 'Synced ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      // Show banner on setup tab
+      document.getElementById('sync-status-banner').classList.remove('hidden');
+    }
+    renderDash();
+  } catch(e) {
+    // data.json doesn't exist yet — that's fine, CSV import still works
+  }
+}
+
+function showTab(name, el) {
+  ['dashboard','log','import','setup'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+  });
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (name === 'dashboard') renderDash();
+  if (name === 'log') renderTagQueue();
+}
+
+function setType(t) {
+  activeType = t;
+  document.getElementById('pill-singles').className = 'pill s' + (t === 'singles' ? ' active' : '');
+  document.getElementById('pill-doubles').className = 'pill d' + (t === 'doubles' ? ' active' : '');
+  document.getElementById('type-label').textContent = t;
+  renderDash();
+}
+
+function setManualType(t) {
+  manualType = t;
+  document.getElementById('m-pill-s').className = 'pill s' + (t === 'singles' ? ' active' : '');
+  document.getElementById('m-pill-d').className = 'pill d' + (t === 'doubles' ? ' active' : '');
+}
+
+function rolling(arr, n) {
+  return arr.map((_, i) => { const sl = arr.slice(Math.max(0,i-n+1),i+1); return sl.reduce((a,b)=>a+b,0)/sl.length; });
+}
+
+function drawBar(id, data, threshold) {
+  const canvas = document.getElementById(id); if (!canvas) return;
+  const dpr = window.devicePixelRatio||1, W = canvas.offsetWidth||400, H = canvas.offsetHeight||130;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+  if (!data.length) { ctx.fillStyle='#888'; ctx.font='12px sans-serif'; ctx.fillText('No data yet',10,H/2); return; }
+  const max = Math.max(...data.map(d=>d.y), threshold||0)*1.1;
+  const bw = Math.max(2,(W/data.length)-2);
+  data.forEach((d,i) => {
+    const bh = Math.max(2,(d.y/max)*(H-12));
+    ctx.fillStyle = (threshold&&d.y>threshold)?'#E24B4A':'#378ADD'; ctx.globalAlpha=0.85;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(i*(bw+2)+1,H-bh-4,bw,bh,2); else ctx.rect(i*(bw+2)+1,H-bh-4,bw,bh);
+    ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  if(threshold){const ty=H-(threshold/max)*(H-12)-4;ctx.strokeStyle='#E24B4A';ctx.lineWidth=1;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(0,ty);ctx.lineTo(W,ty);ctx.stroke();ctx.setLineDash([]);}
+}
+
+function drawLine(id, datasets) {
+  const canvas=document.getElementById(id); if(!canvas) return;
+  const dpr=window.devicePixelRatio||1,W=canvas.offsetWidth||400,H=canvas.offsetHeight||130;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+  const allV=datasets.flatMap(d=>d.data.map(p=>p.y)).filter(Boolean);
+  if(!allV.length) return;
+  const min=Math.min(...allV)*0.9,max=Math.max(...allV)*1.05;
+  const px=(i,len)=>len<=1?W/2:(i/(len-1))*W;
+  const py=v=>H-((v-min)/(max-min||1))*(H-16)-4;
+  datasets.forEach(ds=>{
+    if(!ds.data.length) return;
+    ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=ds.width||1.5;ctx.globalAlpha=ds.alpha||1;
+    ds.data.forEach((p,i)=>i===0?ctx.moveTo(px(i,ds.data.length),py(p.y)):ctx.lineTo(px(i,ds.data.length),py(p.y)));
+    ctx.stroke();ctx.globalAlpha=1;
+  });
+}
+
+function renderDash() {
+  const thr=parseFloat(document.getElementById('threshold-inp').value)||15;
+  const typed=sessions.filter(s=>s.type===activeType).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const strains=typed.map(s=>s.strain);
+  const avg=strains.length?(strains.reduce((a,b)=>a+b,0)/strains.length).toFixed(1):'—';
+  const peak=strains.length?Math.max(...strains).toFixed(1):'—';
+  const flags=strains.filter(v=>v>thr).length;
+  const now=new Date();
+  const mtd=typed.filter(s=>{const d=new Date(s.date+'T12:00:00');return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});
+  const mtdAvg=mtd.length?(mtd.reduce((a,s)=>a+s.strain,0)/mtd.length).toFixed(1):'—';
+  document.getElementById('s-avg').textContent=avg;
+  document.getElementById('s-count').textContent=typed.length+' sessions total';
+  document.getElementById('s-peak').textContent=peak;
+  document.getElementById('s-mtd').textContent=mtdAvg;
+  document.getElementById('s-mtd-count').textContent=mtd.length+' this month';
+  document.getElementById('s-flags').textContent=flags;
+  document.getElementById('s-flags-sub').textContent='above '+thr;
+  const chartData=typed.map((s,i)=>({x:i,y:s.strain}));
+  setTimeout(()=>{
+    drawBar('bar-chart',chartData,thr);
+    const r7=rolling(strains,7),r30=rolling(strains,30);
+    drawLine('line-chart',[
+      {data:chartData,color:'#378ADD',width:0.8,alpha:0.35},
+      {data:r7.map((v,i)=>({x:i,y:+v.toFixed(2)})),color:'#EF9F27',width:2},
+      {data:r30.map((v,i)=>({x:i,y:+v.toFixed(2)})),color:'#7F77DD',width:2},
+    ]);
+  },0);
+  const list=document.getElementById('session-list');
+  const recent=[...typed].reverse().slice(0,20);
+  if(!recent.length){list.innerHTML='<div style="font-size:13px;color:var(--text-secondary);padding:20px 0;text-align:center;">No '+activeType+' sessions yet.</div>';}
+  else{
+    list.innerHTML='<div class="session-grid session-header"><span>Date</span><span>Strain</span><span>Recovery</span><span>Source</span><span></span></div>'+
+    recent.map(s=>{
+      const flagged=s.strain>thr;
+      const d=new Date(s.date+'T12:00:00');
+      const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      return '<div class="session-grid session-row">'+
+        '<span class="text-secondary">'+dateStr+'</span>'+
+        '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+(flagged?' ⚑':'')+'</span>'+
+        '<span class="mono text-secondary">'+(s.recovery!=null?Math.round(s.recovery)+'%':'—')+'</span>'+
+        '<span class="text-secondary" style="font-size:11px;text-transform:uppercase;">'+(s.source||'manual')+'</span>'+
+        '<button onclick="deleteSession(\''+s.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:14px;padding:0;">✕</button>'+
+        '</div>';
+    }).join('');
+  }
+  const untagged=sessions.filter(s=>s.type===null);
+  const notice=document.getElementById('untagged-notice');
+  if(untagged.length){notice.classList.remove('hidden');document.getElementById('untagged-text').textContent=untagged.length+' session'+(untagged.length>1?'s':'')+' need tagging';}
+  else notice.classList.add('hidden');
+}
+
+function deleteSession(id){sessions=sessions.filter(s=>s.id!==id);save();renderDash();}
+
+function renderTagQueue(){
+  const queue=sessions.filter(s=>s.type===null);
+  const el=document.getElementById('tag-queue');
+  if(!queue.length){el.innerHTML='<div style="font-size:13px;color:var(--text-secondary);padding:24px 0;text-align:center;">All sessions tagged ✓</div>';return;}
+  el.innerHTML=queue.slice(0,30).map(s=>{
+    const d=new Date(s.date+'T12:00:00');
+    const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return '<div class="tag-card">'+
+      '<div><div style="font-size:13px;">'+dateStr+'</div>'+
+      '<div style="font-size:12px;color:var(--text-secondary);font-family:var(--font-mono);">Strain '+s.strain.toFixed(1)+'</div></div>'+
+      '<div class="flex gap-8">'+
+      '<button class="btn" style="font-size:12px;padding:5px 10px;color:var(--blue);" onclick="tagSession(\''+s.id+'\',\'singles\')">Singles</button>'+
+      '<button class="btn" style="font-size:12px;padding:5px 10px;color:var(--green);" onclick="tagSession(\''+s.id+'\',\'doubles\')">Doubles</button>'+
+      '<button class="btn" style="font-size:12px;padding:5px 10px;" onclick="skipSession(\''+s.id+'\')">Skip</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function tagSession(id,type){sessions=sessions.map(s=>s.id===id?{...s,type}:s);save();renderTagQueue();updateStatus();}
+function skipSession(id){sessions=sessions.filter(s=>s.id!==id);save();renderTagQueue();}
+
+function addManual(){
+  const date=document.getElementById('m-date').value;
+  const strainRaw=document.getElementById('m-strain').value;
+  const recovRaw=document.getElementById('m-recovery').value;
+  const msg=document.getElementById('manual-msg');
+  if(!date||!strainRaw){msg.style.color='var(--red)';msg.textContent='Date and strain are required.';return;}
+  if(new Date(date+'T12:00:00').getFullYear()<2026){msg.style.color='var(--red)';msg.textContent='Only 2026+ sessions.';return;}
+  const strain=parseFloat(strainRaw);
+  if(isNaN(strain)||strain<0||strain>21){msg.style.color='var(--red)';msg.textContent='Strain must be 0–21.';return;}
+  sessions.push({id:'manual-'+Date.now(),date,strain,recovery:recovRaw?parseFloat(recovRaw):null,type:manualType,source:'manual'});
+  save();
+  document.getElementById('m-date').value='';document.getElementById('m-strain').value='';document.getElementById('m-recovery').value='';
+  msg.style.color='var(--green)';msg.textContent='Session added.';
+  setTimeout(()=>msg.textContent='',2500);renderDash();
+}
+
+function is2026OrLater(dateStr){return new Date(dateStr+'T12:00:00').getFullYear()>=2026;}
+
+function parseWhoopCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  if(lines.length<2)return{results:[],skipped:0,preYear:0};
+  const delim=lines[0].includes('\t')?'\t':',';
+  const headers=lines[0].split(delim).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+  const findCol=(...names)=>{for(const n of names){const i=headers.findIndex(h=>h.includes(n));if(i>=0)return i;}return -1;};
+  const actIdx=findCol('activity name','activity'),strainIdx=findCol('activity strain','strain'),startIdx=findCol('workout start','start time','cycle start'),durIdx=findCol('duration');
+  const results=[];let skipped=0,preYear=0;
+  for(let i=1;i<lines.length;i++){
+    const line=lines[i].trim();if(!line)continue;
+    const cols=line.split(delim).map(c=>c.trim().replace(/^"|"$/g,''));
+    const activity=actIdx>=0?(cols[actIdx]||''):'';
+    if(!activity.toLowerCase().includes('tennis')){skipped++;continue;}
+    const strain=parseFloat(strainIdx>=0?cols[strainIdx]:'');if(isNaN(strain))continue;
+    const startRaw=startIdx>=0?cols[startIdx]:'';let dateStr='';
+    if(startRaw){const d=new Date(startRaw);if(!isNaN(d))dateStr=d.toISOString().split('T')[0];}
+    if(!dateStr)continue;if(!is2026OrLater(dateStr)){preYear++;continue;}
+    const duration=durIdx>=0&&cols[durIdx]?Math.round(parseFloat(cols[durIdx])):null;
+    const id='whoop-'+dateStr+'-'+Math.round(strain*10);
+    results.push({id,date:dateStr,strain,duration,recovery:null,type:null,source:'whoop-csv'});
+  }
+  return{results,skipped,preYear};
+}
+
+function handleCSV(input){
+  const file=input.files[0];if(!file)return;
+  const msg=document.getElementById('csv-msg');
+  msg.style.color='var(--text-secondary)';msg.textContent='Reading file...';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const{results,skipped,preYear}=parseWhoopCSV(ev.target.result);
+    if(!results.length){msg.style.color='var(--red)';msg.textContent='No 2026+ tennis sessions found.'+(preYear?' ('+preYear+' pre-2026 tennis rows skipped)':'');input.value='';return;}
+    const existingMap=new Map(sessions.map(s=>[s.id,s]));
+    let added=0,dupes=0;
+    results.forEach(r=>{if(existingMap.has(r.id)){dupes++;}else{existingMap.set(r.id,r);added++;}});
+    sessions=Array.from(existingMap.values());save();
+    const parts=[added+' new session'+(added!==1?'s':'')+' added'];
+    if(dupes)parts.push(dupes+' already stored (tags preserved)');
+    if(preYear)parts.push(preYear+' pre-2026 skipped');
+    if(skipped)parts.push(skipped+' non-tennis ignored');
+    msg.style.color='var(--green)';msg.textContent=parts.join(' · ')+(added>0?'. Go to Log Session to tag Singles / Doubles.':'');
+    input.value='';renderDash();
+  };
+  reader.readAsText(file);
+}
+
+window.addEventListener('resize',()=>renderDash());
+
+// Boot
+load();
+updateStatus();
+renderDash();
+fetchDataJson(); // Pull latest from GitHub Pages data.json if available
+</script>
+</body>
+</html>
