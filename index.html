@@ -594,7 +594,7 @@ function parseWhoopCSV(text){
     const line=lines[i].trim();if(!line)continue;
     const cols=line.split(delim).map(c=>c.trim().replace(/^"|"$/g,''));
     const activity=actIdx>=0?(cols[actIdx]||''):'';
-    if(!activity.toLowerCase().includes('tennis')){skipped++;continue;}
+    if(activity.trim().toLowerCase() !== 'tennis'){skipped++;continue;}
     const strain=parseFloat(strainIdx>=0?cols[strainIdx]:'');if(isNaN(strain))continue;
     const startRaw=startIdx>=0?cols[startIdx]:'';let dateStr='';
     if(startRaw){const d=new Date(startRaw);if(!isNaN(d))dateStr=d.toISOString().split('T')[0];}
