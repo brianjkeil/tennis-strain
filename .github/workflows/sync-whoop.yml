@@ -70,7 +70,6 @@ jobs:
                 let data = '';
                 res.on('data', chunk => data += chunk);
                 res.on('end', () => {
-                  console.log('GET', u.pathname, 'status:', res.statusCode);
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
                 });
@@ -99,20 +98,18 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            // Save new refresh token immediately in case of failure later
             if (newRefreshToken && newRefreshToken !== REFRESH_TOKEN) {
               fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
-              console.log('New refresh token saved to new-refresh-token.txt — update WHOOP_REFRESH_TOKEN secret.');
+              console.log('New refresh token saved — update WHOOP_REFRESH_TOKEN secret.');
             }
 
-            console.log('Fetching tennis workouts (v2 API)...');
+            console.log('Fetching all 2026 workouts to identify sport IDs...');
             const cutoff = new Date('2026-01-01T00:00:00Z');
-            let allWorkouts = [];
+            let allRecords = [];
             let nextToken = null;
             let pages = 0;
 
             do {
-              // v2 API endpoint
               let url = 'https://api.prod.whoop.com/developer/v2/activity/workout?limit=25';
               if (nextToken) url += '&nextToken=' + encodeURIComponent(nextToken);
 
@@ -125,21 +122,20 @@ jobs:
               const records = resp.data.records || [];
               console.log('Page ' + (pages + 1) + ': ' + records.length + ' workouts');
 
-              // Log first record structure so we can see the shape
-              if (pages === 0 && records.length > 0) {
-                console.log('Sample record keys:', Object.keys(records[0]).join(', '));
-                console.log('Sample sport_id:', records[0].sport_id);
-                console.log('Sample start:', records[0].start);
-              }
-
-              // Tennis sport_id is 63
-              const tennis = records.filter(w => {
-                if (w.sport_id !== 63) return false;
-                const d = new Date(w.start || w.created_at || '');
-                return d >= cutoff;
+              // Log ALL sport IDs found so we can identify tennis
+              const sportIds = {};
+              records.forEach(w => {
+                const sid = w.sport_id;
+                sportIds[sid] = (sportIds[sid] || 0) + 1;
               });
-              allWorkouts = allWorkouts.concat(tennis);
+              console.log('Sport IDs on this page:', JSON.stringify(sportIds));
 
+              // Log any record from 2026+ with its details
+              records.filter(w => new Date(w.start || '') >= cutoff).forEach(w => {
+                console.log('2026 workout — sport_id:', w.sport_id, '| date:', (w.start||'').substring(0,10), '| strain:', w.score && w.score.strain);
+              });
+
+              allRecords = allRecords.concat(records.filter(w => new Date(w.start || w.created_at || '') >= cutoff));
               nextToken = resp.data.next_token || null;
               pages++;
 
@@ -148,9 +144,12 @@ jobs:
               if (pages > 20) break;
             } while (nextToken);
 
-            console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
+            console.log('Total 2026 workouts found:', allRecords.length);
+            console.log('All unique sport IDs in 2026:', [...new Set(allRecords.map(w => w.sport_id))].join(', '));
 
-            const sessions = allWorkouts.map(w => {
+            // For now include ALL 2026 workouts so we can see what comes through
+            // We will filter to tennis only once we know the correct sport_id
+            const sessions = allRecords.map(w => {
               const d = new Date(w.start || w.created_at);
               const dateStr = d.toISOString().split('T')[0];
               const strain = w.score && w.score.strain ? Math.round(w.score.strain * 10) / 10 : 0;
@@ -158,8 +157,10 @@ jobs:
                 id: 'whoop-api-' + (w.id || w.workout_id),
                 date: dateStr,
                 strain,
+                sport_id: w.sport_id,
                 duration: null,
                 recovery: null,
+                type: null,
                 source: 'whoop-api'
               };
             });
