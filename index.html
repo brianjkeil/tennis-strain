@@ -492,7 +492,7 @@ function drawLine(id, datasets) {
 
 function renderDash() {
   const thr=parseFloat(document.getElementById('threshold-inp').value)||15;
-  const typed=sessions.filter(s=>activeType==='all'?true:s.type===activeType).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const typed=sessions.filter(s=>activeType==='all'?(s.type!==undefined):s.type===activeType).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const strains=typed.map(s=>s.strain);
   const avg=strains.length?(strains.reduce((a,b)=>a+b,0)/strains.length).toFixed(1):'—';
   const peak=strains.length?Math.max(...strains).toFixed(1):'—';
@@ -535,7 +535,7 @@ function renderDash() {
         '</div>';
     }).join('');
   }
-  const untagged=sessions.filter(s=>s.type===null);
+  const untagged=sessions.filter(s=>s.type===null||s.type===undefined);
   const notice=document.getElementById('untagged-notice');
   if(untagged.length){notice.classList.remove('hidden');document.getElementById('untagged-text').textContent=untagged.length+' session'+(untagged.length>1?'s':'')+' need tagging';}
   else notice.classList.add('hidden');
@@ -544,12 +544,12 @@ function renderDash() {
 function deleteSession(id){sessions=sessions.filter(s=>s.id!==id);save();renderDash();}
 
 function tagAll(type){
-  sessions=sessions.map(s=>s.type===null?{...s,type}:s);
+  sessions=sessions.map(s=>(s.type===null||s.type===undefined)?{...s,type}:s);
   save();renderTagQueue();updateStatus();renderDash();
 }
 
 function renderTagQueue(){
-  const queue=sessions.filter(s=>s.type===null);
+  const queue=sessions.filter(s=>s.type===null||s.type===undefined);
   const el=document.getElementById('tag-queue');
   if(!queue.length){el.innerHTML='<div style="font-size:13px;color:var(--text-secondary);padding:24px 0;text-align:center;">All sessions tagged ✓</div>';return;}
   const bulkBar='<div style="display:flex;gap:8px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);align-items:center;">'+
