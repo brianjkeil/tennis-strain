@@ -8,12 +8,16 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      secrets: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Fetch WHOOP data and write data.json
+        id: fetch
         env:
           WHOOP_CLIENT_ID: ${{ secrets.WHOOP_CLIENT_ID }}
           WHOOP_CLIENT_SECRET: ${{ secrets.WHOOP_CLIENT_SECRET }}
@@ -26,6 +30,7 @@ jobs:
           const CLIENT_ID     = process.env.WHOOP_CLIENT_ID;
           const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET;
           const REFRESH_TOKEN = process.env.WHOOP_REFRESH_TOKEN;
+          const TENNIS_SPORT_ID = 34;
 
           if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
             console.error('Missing required secrets.');
@@ -48,7 +53,6 @@ jobs:
                 let data = '';
                 res.on('data', chunk => data += chunk);
                 res.on('end', () => {
-                  console.log('POST status:', res.statusCode);
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
                 });
@@ -98,14 +102,14 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            if (newRefreshToken && newRefreshToken !== REFRESH_TOKEN) {
-              fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
-              console.log('New refresh token saved — update WHOOP_REFRESH_TOKEN secret.');
-            }
+            // Always write new refresh token to file so workflow can update secret
+            fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
+            // Also write to GITHUB_OUTPUT so next step can read it
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, 'new_refresh_token=' + newRefreshToken + '\n');
 
-            console.log('Fetching all 2026 workouts to identify sport IDs...');
+            console.log('Fetching tennis workouts (sport_id=' + TENNIS_SPORT_ID + ')...');
             const cutoff = new Date('2026-01-01T00:00:00Z');
-            let allRecords = [];
+            let allWorkouts = [];
             let nextToken = null;
             let pages = 0;
 
@@ -120,22 +124,12 @@ jobs:
               }
 
               const records = resp.data.records || [];
-              console.log('Page ' + (pages + 1) + ': ' + records.length + ' workouts');
-
-              // Log ALL sport IDs found so we can identify tennis
-              const sportIds = {};
-              records.forEach(w => {
-                const sid = w.sport_id;
-                sportIds[sid] = (sportIds[sid] || 0) + 1;
+              const tennis = records.filter(w => {
+                if (w.sport_id !== TENNIS_SPORT_ID) return false;
+                const d = new Date(w.start || w.created_at || '');
+                return d >= cutoff;
               });
-              console.log('Sport IDs on this page:', JSON.stringify(sportIds));
-
-              // Log any record from 2026+ with its details
-              records.filter(w => new Date(w.start || '') >= cutoff).forEach(w => {
-                console.log('2026 workout — sport_id:', w.sport_id, '| date:', (w.start||'').substring(0,10), '| strain:', w.score && w.score.strain);
-              });
-
-              allRecords = allRecords.concat(records.filter(w => new Date(w.start || w.created_at || '') >= cutoff));
+              allWorkouts = allWorkouts.concat(tennis);
               nextToken = resp.data.next_token || null;
               pages++;
 
@@ -144,12 +138,9 @@ jobs:
               if (pages > 20) break;
             } while (nextToken);
 
-            console.log('Total 2026 workouts found:', allRecords.length);
-            console.log('All unique sport IDs in 2026:', [...new Set(allRecords.map(w => w.sport_id))].join(', '));
+            console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
 
-            // For now include ALL 2026 workouts so we can see what comes through
-            // We will filter to tennis only once we know the correct sport_id
-            const sessions = allRecords.map(w => {
+            const sessions = allWorkouts.map(w => {
               const d = new Date(w.start || w.created_at);
               const dateStr = d.toISOString().split('T')[0];
               const strain = w.score && w.score.strain ? Math.round(w.score.strain * 10) / 10 : 0;
@@ -157,10 +148,8 @@ jobs:
                 id: 'whoop-api-' + (w.id || w.workout_id),
                 date: dateStr,
                 strain,
-                sport_id: w.sport_id,
                 duration: null,
                 recovery: null,
-                type: null,
                 source: 'whoop-api'
               };
             });
@@ -189,10 +178,54 @@ jobs:
           run().catch(e => { console.error(e); process.exit(1); });
           EOF
 
+      - name: Update WHOOP_REFRESH_TOKEN secret automatically
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_TOKEN: ${{ steps.fetch.outputs.new_refresh_token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$NEW_TOKEN" ]; then
+            echo "No new refresh token to update."
+            exit 0
+          fi
+          echo "Updating WHOOP_REFRESH_TOKEN secret..."
+          # Get repo public key for secret encryption
+          KEY_DATA=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/secrets/public-key")
+          KEY_ID=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key_id))")
+          PUB_KEY=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key))")
+
+          # Encrypt the token using libsodium
+          npm install -g tweetsodium 2>/dev/null || true
+
+          ENCRYPTED=$(node -e "
+            const sodium = require('tweetsodium');
+            const key = Buffer.from('$PUB_KEY', 'base64');
+            const value = Buffer.from(process.env.NEW_TOKEN);
+            const encrypted = sodium.seal(value, key);
+            console.log(Buffer.from(encrypted).toString('base64'));
+          " 2>/dev/null)
+
+          if [ -z "$ENCRYPTED" ]; then
+            echo "Encryption failed — saving token to new-refresh-token.txt instead."
+            echo "$NEW_TOKEN" > new-refresh-token.txt
+          else
+            # Update the secret via GitHub API
+            curl -s -X PUT \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPO/actions/secrets/WHOOP_REFRESH_TOKEN" \
+              -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}"
+            echo "WHOOP_REFRESH_TOKEN secret updated successfully."
+            rm -f new-refresh-token.txt
+          fi
+
       - name: Commit data.json to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json new-refresh-token.txt 2>/dev/null || true
+          git add data.json
+          git add new-refresh-token.txt 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: sync WHOOP tennis data $(date -u '+%Y-%m-%d')"
           git push
