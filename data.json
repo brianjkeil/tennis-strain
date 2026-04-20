@@ -697,10 +697,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-04-20T15:49:50.377Z",
+  "lastSync": "2026-04-20T15:51:47.479Z",
   "syncStats": {
-    "added": 87,
-    "preserved": 0,
+    "added": 0,
+    "preserved": 87,
     "total": 87
   }
 }
