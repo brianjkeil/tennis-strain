@@ -1,0 +1,213 @@
+name: Sync WHOOP Tennis Data
+
+on:
+  schedule:
+    # Runs every morning at 6am ET (10am UTC)
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+    # Also allows manual trigger from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch WHOOP data and write data.json
+        env:
+          WHOOP_CLIENT_ID: ${{ secrets.WHOOP_CLIENT_ID }}
+          WHOOP_CLIENT_SECRET: ${{ secrets.WHOOP_CLIENT_SECRET }}
+          WHOOP_REFRESH_TOKEN: ${{ secrets.WHOOP_REFRESH_TOKEN }}
+        run: |
+          node - <<'EOF'
+          const https = require('https');
+
+          const CLIENT_ID     = process.env.WHOOP_CLIENT_ID;
+          const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET;
+          const REFRESH_TOKEN = process.env.WHOOP_REFRESH_TOKEN;
+
+          if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
+            console.error('Missing required secrets. Check WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET, WHOOP_REFRESH_TOKEN.');
+            process.exit(1);
+          }
+
+          function post(url, body) {
+            return new Promise((resolve, reject) => {
+              const data = new URLSearchParams(body).toString();
+              const u = new URL(url);
+              const req = https.request({
+                hostname: u.hostname,
+                path: u.pathname + u.search,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Content-Length': Buffer.byteLength(data)
+                }
+              }, res => {
+                let body = '';
+                res.on('data', c => body += c);
+                res.on('end', () => {
+                  try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
+                  catch(e) { reject(new Error('Parse error: ' + body)); }
+                });
+              });
+              req.on('error', reject);
+              req.write(data);
+              req.end();
+            });
+          }
+
+          function get(url, token) {
+            return new Promise((resolve, reject) => {
+              const u = new URL(url);
+              const req = https.request({
+                hostname: u.hostname,
+                path: u.pathname + u.search,
+                method: 'GET',
+                headers: { Authorization: 'Bearer ' + token }
+              }, res => {
+                let body = '';
+                res.on('data', c => body += c);
+                res.on('end', () => {
+                  try { resolve({ status: res.statusCode, data: JSON.parse(body) }); }
+                  catch(e) { reject(new Error('Parse error: ' + body)); }
+                });
+              });
+              req.on('error', reject);
+              req.end();
+            });
+          }
+
+          async function run() {
+            // Step 1: Refresh the access token
+            console.log('Refreshing WHOOP access token...');
+            const tokenResp = await post('https://api.prod.whoop.com/oauth/oauth2/token', {
+              grant_type: 'refresh_token',
+              refresh_token: REFRESH_TOKEN,
+              client_id: CLIENT_ID,
+              client_secret: CLIENT_SECRET,
+              scope: 'read:workout offline'
+            });
+
+            if (tokenResp.status !== 200) {
+              console.error('Token refresh failed:', JSON.stringify(tokenResp.data));
+              process.exit(1);
+            }
+
+            const accessToken = tokenResp.data.access_token;
+            const newRefreshToken = tokenResp.data.refresh_token;
+            console.log('Token refreshed successfully.');
+
+            // Step 2: Fetch all tennis workouts from 2026 onward
+            console.log('Fetching tennis workouts...');
+            const cutoff = new Date('2026-01-01T00:00:00Z');
+            let allWorkouts = [];
+            let nextToken = null;
+            let pages = 0;
+
+            do {
+              let url = 'https://api.prod.whoop.com/developer/v1/workout?limit=25';
+              if (nextToken) url += '&nextToken=' + encodeURIComponent(nextToken);
+
+              const resp = await get(url, accessToken);
+              if (resp.status !== 200) {
+                console.error('Workout fetch failed:', JSON.stringify(resp.data));
+                process.exit(1);
+              }
+
+              const records = resp.data.records || [];
+              console.log('Page ' + (pages + 1) + ': ' + records.length + ' workouts');
+
+              // Filter to tennis (sport_id 63) and 2026+
+              const tennis = records.filter(w => {
+                if (w.sport_id !== 63) return false;
+                const d = new Date(w.start || w.created_at || '');
+                return d >= cutoff;
+              });
+              allWorkouts = allWorkouts.concat(tennis);
+
+              nextToken = resp.data.next_token || null;
+              pages++;
+
+              // Stop if oldest record is before 2026
+              const oldest = records[records.length - 1];
+              if (oldest && new Date(oldest.start || oldest.created_at || '') < cutoff) break;
+              if (pages > 20) break; // safety cap
+
+            } while (nextToken);
+
+            console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
+
+            // Step 3: Shape the data
+            const sessions = allWorkouts.map(w => {
+              const d = new Date(w.start || w.created_at);
+              const dateStr = d.toISOString().split('T')[0];
+              const strain = w.score && w.score.strain ? Math.round(w.score.strain * 10) / 10 : 0;
+              return {
+                id: 'whoop-api-' + w.id,
+                date: dateStr,
+                strain: strain,
+                duration: null,
+                recovery: null,
+                source: 'whoop-api'
+              };
+            });
+
+            // Step 4: Read existing data.json to preserve tags
+            const fs = require('fs');
+            let existingData = { sessions: [], lastSync: null };
+            try {
+              const raw = fs.readFileSync('data.json', 'utf8');
+              existingData = JSON.parse(raw);
+            } catch(e) {
+              console.log('No existing data.json — creating fresh.');
+            }
+
+            // Merge: preserve existing tags, add new sessions
+            const existingMap = new Map((existingData.sessions || []).map(s => [s.id, s]));
+            let added = 0, preserved = 0;
+            sessions.forEach(s => {
+              if (existingMap.has(s.id)) {
+                preserved++;
+                // Keep existing entry (preserves type tag)
+              } else {
+                existingMap.set(s.id, s);
+                added++;
+              }
+            });
+
+            const merged = Array.from(existingMap.values())
+              .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const output = {
+              sessions: merged,
+              lastSync: new Date().toISOString(),
+              syncStats: { added, preserved, total: merged.length }
+            };
+
+            fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
+            console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + merged.length + ' total.');
+
+            // Step 5: Write new refresh token back to a file so you can update the secret
+            // (GitHub Actions can't write back to secrets automatically)
+            if (newRefreshToken && newRefreshToken !== REFRESH_TOKEN) {
+              fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
+              console.log('WARNING: Refresh token rotated. See new-refresh-token.txt and update WHOOP_REFRESH_TOKEN secret.');
+            } else {
+              // Write empty file so git doesn't fail
+              if (fs.existsSync('new-refresh-token.txt')) fs.unlinkSync('new-refresh-token.txt');
+            }
+          }
+
+          run().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - name: Commit data.json to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --staged --quiet || git commit -m "chore: sync WHOOP tennis data $(date -u '+%Y-%m-%d')"
+          git push
