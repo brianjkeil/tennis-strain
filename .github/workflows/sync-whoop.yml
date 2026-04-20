@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      secrets: write
 
     steps:
       - name: Checkout repo
@@ -102,10 +101,11 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            // Always write new refresh token to file so workflow can update secret
+            // Write new refresh token to file and GitHub output
             fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
-            // Also write to GITHUB_OUTPUT so next step can read it
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, 'new_refresh_token=' + newRefreshToken + '\n');
+            if (process.env.GITHUB_OUTPUT) {
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'new_refresh_token=' + newRefreshToken + '\n');
+            }
 
             console.log('Fetching tennis workouts (sport_id=' + TENNIS_SPORT_ID + ')...');
             const cutoff = new Date('2026-01-01T00:00:00Z');
@@ -189,36 +189,50 @@ jobs:
             exit 0
           fi
           echo "Updating WHOOP_REFRESH_TOKEN secret..."
-          # Get repo public key for secret encryption
-          KEY_DATA=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+
+          # Get repo public key
+          KEY_DATA=$(curl -s \
+            -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/secrets/public-key")
-          KEY_ID=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key_id))")
-          PUB_KEY=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key))")
 
-          # Encrypt the token using libsodium
-          npm install -g tweetsodium 2>/dev/null || true
+          KEY_ID=$(echo "$KEY_DATA" | node -e "
+            let d='';
+            process.stdin.on('data',c=>d+=c);
+            process.stdin.on('end',()=>console.log(JSON.parse(d).key_id));
+          ")
+
+          PUB_KEY=$(echo "$KEY_DATA" | node -e "
+            let d='';
+            process.stdin.on('data',c=>d+=c);
+            process.stdin.on('end',()=>console.log(JSON.parse(d).key));
+          ")
+
+          # Install tweetsodium for encryption
+          npm install tweetsodium --no-save 2>/dev/null
 
           ENCRYPTED=$(node -e "
-            const sodium = require('tweetsodium');
+            const sodium = require('./node_modules/tweetsodium');
             const key = Buffer.from('$PUB_KEY', 'base64');
-            const value = Buffer.from(process.env.NEW_TOKEN);
+            const value = Buffer.from('$NEW_TOKEN');
             const encrypted = sodium.seal(value, key);
             console.log(Buffer.from(encrypted).toString('base64'));
-          " 2>/dev/null)
+          ")
 
           if [ -z "$ENCRYPTED" ]; then
-            echo "Encryption failed — saving token to new-refresh-token.txt instead."
-            echo "$NEW_TOKEN" > new-refresh-token.txt
+            echo "Encryption failed — new token saved to new-refresh-token.txt, update secret manually."
           else
-            # Update the secret via GitHub API
-            curl -s -X PUT \
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$REPO/actions/secrets/WHOOP_REFRESH_TOKEN" \
-              -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}"
-            echo "WHOOP_REFRESH_TOKEN secret updated successfully."
-            rm -f new-refresh-token.txt
+              -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}")
+            if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "201" ]; then
+              echo "WHOOP_REFRESH_TOKEN secret updated successfully."
+              rm -f new-refresh-token.txt
+            else
+              echo "Secret update returned HTTP $HTTP_STATUS — token saved to new-refresh-token.txt instead."
+            fi
           fi
 
       - name: Commit data.json to repo
