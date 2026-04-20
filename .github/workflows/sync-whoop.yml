@@ -168,6 +168,13 @@ jobs:
               console.log('No existing data.json — creating fresh.');
             }
 
+            // Read tags.json if it exists — these are tags written by the browser app
+            let tags = {};
+            try {
+              tags = JSON.parse(fs.readFileSync('tags.json', 'utf8'));
+              console.log('Found tags.json with ' + Object.keys(tags).length + ' tags.');
+            } catch(e) { console.log('No tags.json — none needed.'); }
+
             const existingMap = new Map((existingData.sessions || []).map(s => [s.id, s]));
             let added = 0, preserved = 0;
             sessions.forEach(s => {
@@ -175,8 +182,11 @@ jobs:
               else { existingMap.set(s.id, s); added++; }
             });
 
-            const merged = Array.from(existingMap.values())
-              .sort((a, b) => new Date(a.date) - new Date(b.date));
+            // Apply tags and sort
+            const merged = Array.from(existingMap.values()).map(s => {
+              if (tags[s.id]) return { ...s, type: tags[s.id] };
+              return s;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const output = {
               sessions: merged,
@@ -186,6 +196,12 @@ jobs:
 
             fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
             console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + merged.length + ' total.');
+
+            // Reset tags.json after merging so we don't re-apply stale tags
+            if (Object.keys(tags).length > 0) {
+              fs.writeFileSync('tags.json', JSON.stringify({}));
+              console.log('tags.json reset after merge.');
+            }
 
             if (newRefreshToken && newRefreshToken !== REFRESH_TOKEN) {
               fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
