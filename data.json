@@ -1,11 +1,1011 @@
 {
   "sessions": [
     {
+      "id": "whoop-api-b46ac550-371d-45b7-8076-53240d293e7d",
+      "date": "2026-01-01",
+      "strain": 8.8,
+      "sport_id": 101,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e54fb2ba-05f4-4368-99a0-4a2c71e9fa1d",
+      "date": "2026-01-01",
+      "strain": 5.6,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ff4de1c6-1298-42c4-89c1-105f3679a821",
+      "date": "2026-01-01",
+      "strain": 11.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-186e5b55-637f-4631-875d-e55c1a6a4222",
+      "date": "2026-01-01",
+      "strain": 11,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-34847882-6c92-4fc5-bf97-9fd82d175778",
+      "date": "2026-01-02",
+      "strain": 0,
+      "sport_id": 247,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-78d91d3a-a165-478b-bc8d-0820c3f11863",
+      "date": "2026-01-02",
+      "strain": 5.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-7c999860-f201-4e1b-9303-ab69bdf156f0",
+      "date": "2026-01-02",
+      "strain": 13.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ebebb750-97a7-4581-9aa5-4e7c5bce8696",
+      "date": "2026-01-02",
+      "strain": 10.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f2ddde2b-2059-46e8-bbc8-ae122c446ff5",
+      "date": "2026-01-04",
+      "strain": 15.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-641a2881-499e-4392-ba26-620482477d5d",
+      "date": "2026-01-05",
+      "strain": 14.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-aa2c120c-6c11-40d3-a0e5-72f5cf200bd0",
+      "date": "2026-01-05",
+      "strain": 0,
+      "sport_id": 131,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b38e5c13-0d9c-4edc-a9e2-f96b9e2ae372",
+      "date": "2026-01-05",
+      "strain": 6.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-3f3d97eb-0834-43a0-a91a-0c523147f25b",
+      "date": "2026-01-06",
+      "strain": 5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-27453dab-479a-45d4-8c3d-68bddb91322f",
+      "date": "2026-01-07",
+      "strain": 12.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-44d6cc28-7e64-4a72-b411-25f42ff923c5",
+      "date": "2026-01-07",
+      "strain": 5.8,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c59de19f-cf5f-4f29-a0e1-fff98180edee",
+      "date": "2026-01-07",
+      "strain": 14,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f86d3582-b748-45f7-ae72-1e373772d4ce",
+      "date": "2026-01-08",
+      "strain": 4.9,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a25f71a8-4f5d-496a-add0-9e67e0bf0df5",
+      "date": "2026-01-08",
+      "strain": 0,
+      "sport_id": 131,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b8edf0bd-7e7b-4ef7-8605-e4dcad761080",
+      "date": "2026-01-09",
+      "strain": 0,
+      "sport_id": 121,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ad81baac-5cbe-49b6-b5c5-d9a55f8eb042",
+      "date": "2026-01-09",
+      "strain": 15.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5939aecb-1a4f-402c-b1cb-07ae5a2076e4",
+      "date": "2026-01-10",
+      "strain": 7.2,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5261d67b-234f-4cbd-b582-048f75e4f245",
+      "date": "2026-01-10",
+      "strain": 11.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-64607f65-1502-4507-bea3-cac6f6783c7f",
+      "date": "2026-01-10",
+      "strain": 10.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-bf4f99d7-116b-43f7-8a27-f71a6f28d2a6",
+      "date": "2026-01-10",
+      "strain": 12.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-2ad2719b-bc0e-44a2-93fa-65228290940a",
+      "date": "2026-01-11",
+      "strain": 12.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c2be1c9a-407b-4323-8890-36aea22e45ec",
+      "date": "2026-01-11",
+      "strain": 0,
+      "sport_id": 131,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f337dccc-882b-49d8-837c-b35ae1ccd090",
+      "date": "2026-01-12",
+      "strain": 15.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-fbff76af-f83f-427b-a4b8-4af685ec100f",
+      "date": "2026-01-12",
+      "strain": 4.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ba34b279-3365-4a0c-bb89-31d137d557fa",
+      "date": "2026-01-13",
+      "strain": 11.1,
+      "sport_id": 101,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-66db183e-3e35-4e52-a79e-a335f9ec1130",
+      "date": "2026-01-15",
+      "strain": 15,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5c320be1-d19c-4e8a-ac31-fd9add793762",
+      "date": "2026-01-16",
+      "strain": 13.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-552a84e7-4ea6-43d4-8e4a-74e43eb034cd",
+      "date": "2026-01-17",
+      "strain": 5.1,
+      "sport_id": -1,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-dff772d7-1d58-4914-b1ac-9c62c4b6c36a",
+      "date": "2026-01-17",
+      "strain": 11.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-93c62c7f-8006-4e3c-a03f-4b7781903131",
+      "date": "2026-01-17",
+      "strain": 12.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-744a8c17-0115-496a-bcdc-48fa4be2d846",
+      "date": "2026-01-17",
+      "strain": 4.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d8802c93-77ea-4f7a-8dd0-73afd725c31e",
+      "date": "2026-01-18",
+      "strain": 7.1,
+      "sport_id": 235,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e4db3744-7b92-4b49-81e2-e4da688c804c",
+      "date": "2026-01-18",
+      "strain": 12.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a43c2239-f264-4ded-9296-45c9202160b9",
+      "date": "2026-01-18",
+      "strain": 0,
+      "sport_id": 241,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1e59bc8d-6a65-48da-b7b7-9234f8ef7536",
+      "date": "2026-01-19",
+      "strain": 15.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-de3fbaa7-5add-4294-ae8c-1e1597ea1f2f",
+      "date": "2026-01-19",
+      "strain": 0,
+      "sport_id": 241,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-846f7651-8657-476b-9eda-04503f297d6e",
+      "date": "2026-01-20",
+      "strain": 4.6,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f8243c7d-7066-4110-ad51-839e16b5c3ff",
+      "date": "2026-01-20",
+      "strain": 16,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d44fbaa9-6968-438f-b425-f1c05a1d346a",
+      "date": "2026-01-21",
+      "strain": 9.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-325c3c21-d224-4549-bd2c-6bc40a4868eb",
+      "date": "2026-01-23",
+      "strain": 16.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f82fde89-ce68-423d-9295-e8aa3307646c",
+      "date": "2026-01-24",
+      "strain": 5.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b158070c-e34e-4135-b436-63808d04081d",
+      "date": "2026-01-24",
+      "strain": 9.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-fcbdb26e-1ba9-4400-85b4-569b14f8f8f9",
+      "date": "2026-01-24",
+      "strain": 12.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-599fc97b-27d3-4620-8422-de02f9e49c76",
+      "date": "2026-01-24",
+      "strain": 0,
+      "sport_id": 131,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8bedd9d9-cfb1-44b8-8d39-cac4a77d8c71",
+      "date": "2026-01-25",
+      "strain": 12.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-cc17bf3d-fb01-4c38-9002-a16a5e12a42a",
+      "date": "2026-01-25",
+      "strain": 16.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d8152ae4-eca5-4b27-a475-18da1201849f",
+      "date": "2026-01-26",
+      "strain": 4.4,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-2ef44922-472e-4950-bf3a-db3b3668f4af",
+      "date": "2026-01-27",
+      "strain": 4.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-4f4c0348-8979-4157-b213-2e1f7c48e6d6",
+      "date": "2026-01-27",
+      "strain": 14.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-776999db-2e0b-41f5-b60e-a85fac08f506",
+      "date": "2026-01-28",
+      "strain": 15.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a5167dc6-9276-481e-b5ef-a17ca6cf8448",
+      "date": "2026-01-29",
+      "strain": 4.1,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d6dc22a9-d7ce-45cf-9a59-78b1930f88ac",
+      "date": "2026-01-30",
+      "strain": 15.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8b131379-814e-42ef-82e8-8443c2c843ee",
+      "date": "2026-01-30",
+      "strain": 4.6,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-be4f9221-b13c-4d4f-80d3-b0234c26143a",
+      "date": "2026-02-01",
+      "strain": 4.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-bc2d32a1-ea82-40a3-a2e5-ca47937d3ff6",
+      "date": "2026-02-01",
+      "strain": 15.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-14441604-e715-4a0e-a017-a62d0e76cca2",
+      "date": "2026-02-02",
+      "strain": 6,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c09d4100-6df9-4ff6-8748-9056ecfbd76f",
+      "date": "2026-02-02",
+      "strain": 15.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9a926c09-74c1-43a9-b4cf-d408ea025365",
+      "date": "2026-02-02",
+      "strain": 5.8,
+      "sport_id": 266,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5185bdda-4152-4f4f-be74-2abe72014a24",
+      "date": "2026-02-04",
+      "strain": 14.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a1abd558-1aff-4e1e-8184-8ad05ec757d9",
+      "date": "2026-02-06",
+      "strain": 7.8,
+      "sport_id": -1,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e2a84c07-7ba9-4950-a4ad-43fc2c7fe416",
+      "date": "2026-02-06",
+      "strain": 14.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-848be517-20e9-4fc2-b241-781376f4e3b4",
+      "date": "2026-02-07",
+      "strain": 4.9,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-6740407b-b052-4db4-963b-548314ecf2ef",
+      "date": "2026-02-07",
+      "strain": 9.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-63f18f89-fed7-4c02-badb-d855621d6ee9",
+      "date": "2026-02-07",
+      "strain": 10,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-27fbe86b-50d3-491c-9c5e-170c8ecc9f6e",
+      "date": "2026-02-07",
+      "strain": 11.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-6972d433-1214-4b26-8768-28a3d569eb33",
+      "date": "2026-02-08",
+      "strain": 5.1,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-21ece493-1928-48c9-9927-861e5e76ec60",
+      "date": "2026-02-08",
+      "strain": 14.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b1df9ef9-f94c-4ae8-9f89-62abf71b86af",
+      "date": "2026-02-13",
+      "strain": 16.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-009b45ff-4178-4b6d-8c5c-c2a6960c4ffe",
+      "date": "2026-02-15",
+      "strain": 11.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-058559cf-2f2d-4251-803f-3cb9e29754bd",
+      "date": "2026-02-16",
+      "strain": 7.9,
+      "sport_id": 0,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8a9a3043-15be-4a1f-b54f-88596d5ea18c",
+      "date": "2026-02-17",
+      "strain": 8,
+      "sport_id": 0,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f96b0344-f89a-4de3-9b36-3c474ef235e3",
+      "date": "2026-02-18",
+      "strain": 10.4,
+      "sport_id": 0,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1f173030-eee5-442b-bf36-5cbdcafb3637",
+      "date": "2026-02-20",
+      "strain": 11.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1fe09c81-20cc-4777-b7ae-1987249fd240",
+      "date": "2026-02-20",
+      "strain": 16.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c243ebf9-8438-427c-a68d-70a4399edcb2",
+      "date": "2026-02-21",
+      "strain": 12.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b14ecf44-db17-4bb0-95b2-7fb0215b63a4",
+      "date": "2026-02-21",
+      "strain": 12.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1cb80f19-5fd9-4e9e-8ef2-a69e8f5bf4a6",
+      "date": "2026-02-22",
+      "strain": 11.2,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-bd443357-0d81-43b4-89f4-55e4fee6dcfd",
+      "date": "2026-02-22",
+      "strain": 16.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-df5f4bb1-71b6-4fdc-b064-48df0fcc14e5",
+      "date": "2026-02-25",
+      "strain": 5.1,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-3ebe2247-14db-4da1-be77-3308e6633d13",
+      "date": "2026-02-25",
+      "strain": 8,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-40b19b7b-d6e8-4064-ae60-e87bfbdc1661",
+      "date": "2026-02-26",
+      "strain": 7.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-71fe2078-685a-4d18-8dd7-6ea01cba57a4",
+      "date": "2026-02-26",
+      "strain": 11.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-04788c01-32ba-4ba6-92ec-2be9a0e6f25f",
+      "date": "2026-02-27",
+      "strain": 9.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9537b320-87d7-460f-ab88-7f93c640c166",
+      "date": "2026-02-28",
+      "strain": 12.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-15a5f0b5-e623-407f-bdd6-a9778ecd22a4",
+      "date": "2026-02-28",
+      "strain": 11.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-2e266a5c-a592-45c1-8ce2-e594406f6134",
+      "date": "2026-02-28",
+      "strain": 10.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
       "id": "whoop-api-9c7d402c-85c1-4c73-8cf7-a3e976f9474f",
       "date": "2026-03-02",
       "strain": 10.5,
       "duration": null,
       "recovery": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8bf75c18-00c9-42eb-b0d2-d0a9b478e99b",
+      "date": "2026-03-02",
+      "strain": 11.2,
+      "sport_id": 0,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-66731b80-e770-4738-b494-b58e24a813f7",
+      "date": "2026-03-03",
+      "strain": 7.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8768f3b1-95b7-4f75-8517-2d09f0ea8ffb",
+      "date": "2026-03-03",
+      "strain": 14.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-01f289d6-b84c-49d7-b32f-7175aec31b8d",
+      "date": "2026-03-04",
+      "strain": 5.2,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-eb938d2c-c91a-42c2-a443-96872c1bb3ec",
+      "date": "2026-03-04",
+      "strain": 13.6,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-bf577f1f-9911-4f49-9368-fa8d86e0cb6b",
+      "date": "2026-03-05",
+      "strain": 14.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c5c6b090-3412-4a83-a1e4-5ec6a41c5a21",
+      "date": "2026-03-06",
+      "strain": 13.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-acbc74b6-85f4-4ccf-adc3-1c029aa427d9",
+      "date": "2026-03-07",
+      "strain": 11.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-faca6c85-f09b-4415-9540-8c8d80899ba8",
+      "date": "2026-03-07",
+      "strain": 10.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-50bb36e9-d4c5-4ab4-96f6-1167416f8a62",
+      "date": "2026-03-07",
+      "strain": 9.1,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
       "source": "whoop-api"
     },
     {
@@ -15,12 +1015,512 @@
       "duration": null,
       "recovery": null,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-0755191a-f620-4649-892e-a38c0d6036c3",
+      "date": "2026-03-14",
+      "strain": 9.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-700b5566-af7b-4bdd-b866-29e165ea645b",
+      "date": "2026-03-14",
+      "strain": 15.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-be537167-d022-4de4-a2b6-e2546bdf4efe",
+      "date": "2026-03-14",
+      "strain": 10.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-62959b58-9880-448d-9290-6223a641bbb9",
+      "date": "2026-03-15",
+      "strain": 8.4,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a553d90b-3b2f-484e-98e4-54c7cd40958a",
+      "date": "2026-03-15",
+      "strain": 13.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-6b6e9545-713d-4e75-abfa-99162bd0d656",
+      "date": "2026-03-16",
+      "strain": 7.4,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9c15c596-8a73-4013-a058-0f0b41b57c71",
+      "date": "2026-03-17",
+      "strain": 5.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d11635cf-eb7c-441e-9fa3-bb86c9f010f7",
+      "date": "2026-03-17",
+      "strain": 7.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-83e8f19c-c8cd-4cb4-97ce-2eed83e14754",
+      "date": "2026-03-19",
+      "strain": 6.4,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b19f3759-669c-4fd9-b5dc-d91836fbc1b8",
+      "date": "2026-03-19",
+      "strain": 14.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b59bf204-9a98-43b7-b8a9-d7d7c3bf01b2",
+      "date": "2026-03-20",
+      "strain": 13.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b9f439f9-9309-460a-9682-9b3d1abe9380",
+      "date": "2026-03-21",
+      "strain": 14.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-25036f3a-8b8f-4673-bd45-cbcf0f6a3b90",
+      "date": "2026-03-21",
+      "strain": 12,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ac83dbf9-dcad-4aa7-8a0a-ed24c70b475c",
+      "date": "2026-03-21",
+      "strain": 5.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1dc8801f-253c-4e4a-827c-7a0608b5b647",
+      "date": "2026-03-22",
+      "strain": 9.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8d58111d-08b1-41d0-81b6-e4ea8e36cc7a",
+      "date": "2026-03-23",
+      "strain": 13,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-fcff2baa-5ba1-455f-983c-3162fbdeca0e",
+      "date": "2026-03-24",
+      "strain": 13.6,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-65143aee-a28f-4369-9a73-04c8d1aed798",
+      "date": "2026-03-26",
+      "strain": 13.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1d0b795f-a746-4978-beac-94578644dd65",
+      "date": "2026-03-27",
+      "strain": 13.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-6e8132eb-784b-4a43-8874-14682717b7f3",
+      "date": "2026-03-29",
+      "strain": 11,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-697dea58-6891-4640-a47f-458276be09f3",
+      "date": "2026-03-29",
+      "strain": 10.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-88db85ab-eb78-4313-a03f-201a7893ab2b",
+      "date": "2026-03-29",
+      "strain": 12.6,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-90e2e4fc-f471-43d8-a952-439081c38983",
+      "date": "2026-03-30",
+      "strain": 9.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-0a525e05-5422-4d30-850e-10a8d0ec9d6e",
+      "date": "2026-03-31",
+      "strain": 8.1,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-39deef3d-4cf6-4eed-af09-0d650c6f37e7",
+      "date": "2026-03-31",
+      "strain": 11.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9ac9ed3c-3502-450f-9dce-b54adaf37786",
+      "date": "2026-04-01",
+      "strain": 14,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-cc549da6-bd6a-484b-b653-96bfcbfc0eee",
+      "date": "2026-04-01",
+      "strain": 8.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-7d326b73-bd4c-4dfc-9df8-6d306338df39",
+      "date": "2026-04-02",
+      "strain": 8.4,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b107b0d6-e999-4ee4-b46d-74508aa348c2",
+      "date": "2026-04-03",
+      "strain": 12.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f0e4c20f-28a2-4460-b602-071157403539",
+      "date": "2026-04-03",
+      "strain": 9.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-34f4b220-8396-415d-b7a1-aa69d11836e2",
+      "date": "2026-04-04",
+      "strain": 6.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-671396ed-5dfb-4f0b-92fd-20e94b435fee",
+      "date": "2026-04-06",
+      "strain": 6.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e5bbee4b-7e22-4d89-8f22-a6fe8bc9be92",
+      "date": "2026-04-06",
+      "strain": 8.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5700b52a-a91e-4747-8020-bcdbff1dc617",
+      "date": "2026-04-10",
+      "strain": 7.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-93edf3bb-d0f1-4396-9085-7faeeaccc54b",
+      "date": "2026-04-10",
+      "strain": 10.9,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-06fca50e-7b31-4a58-b1dc-93b902805d46",
+      "date": "2026-04-11",
+      "strain": 15.3,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9b86f159-1357-4e03-a78d-eed8e1ece72f",
+      "date": "2026-04-11",
+      "strain": 11.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-596954f6-7c3d-4c83-bfaa-106d03ac26f2",
+      "date": "2026-04-13",
+      "strain": 4.5,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-03254381-cde8-47ec-bf8c-0a53c039c669",
+      "date": "2026-04-13",
+      "strain": 14.5,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ffee676f-1306-4b1c-a912-76bb2e72f6bb",
+      "date": "2026-04-14",
+      "strain": 6.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ebbb2123-0b9a-4075-9b06-241d93e87414",
+      "date": "2026-04-14",
+      "strain": 13.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8cbd8dd8-eadb-436d-a97e-4a5ef3a6f738",
+      "date": "2026-04-15",
+      "strain": 0,
+      "sport_id": 121,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-a4929c1d-777b-4914-bb68-bba2631d9f6c",
+      "date": "2026-04-15",
+      "strain": 8.7,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-2253552a-1c7e-419f-bfa4-959fe37ca5f4",
+      "date": "2026-04-17",
+      "strain": 8.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-4cb00da0-ac7c-4b8a-9ebf-7c55e714764d",
+      "date": "2026-04-17",
+      "strain": 11.2,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-6925a980-dbfb-4ceb-90c1-761d32099b9d",
+      "date": "2026-04-18",
+      "strain": 11.2,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-183a6273-72e9-4866-ac57-230f4722add0",
+      "date": "2026-04-18",
+      "strain": 15.1,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d91971e7-147e-4166-b7ee-014bcfa84fb0",
+      "date": "2026-04-18",
+      "strain": 14.3,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-64a55936-f1e3-48a1-982d-6ccfdd72f74f",
+      "date": "2026-04-18",
+      "strain": 7.7,
+      "sport_id": 45,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-216bdc26-a99a-4bc2-913f-17a292e2aceb",
+      "date": "2026-04-19",
+      "strain": 10.8,
+      "sport_id": 34,
+      "duration": null,
+      "recovery": null,
+      "type": null,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-04-20T03:09:14.092Z",
+  "lastSync": "2026-04-20T03:18:08.609Z",
   "syncStats": {
-    "added": 2,
-    "preserved": 0,
-    "total": 2
+    "added": 150,
+    "preserved": 2,
+    "total": 152
   }
 }
