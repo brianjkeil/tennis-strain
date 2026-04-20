@@ -1,5 +1,26 @@
 {
-  "sessions": [],
-  "lastSync": null,
-  "syncStats": { "added": 0, "preserved": 0, "total": 0 }
+  "sessions": [
+    {
+      "id": "whoop-api-9c7d402c-85c1-4c73-8cf7-a3e976f9474f",
+      "date": "2026-03-02",
+      "strain": 10.5,
+      "duration": null,
+      "recovery": null,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-af3c7874-dd30-4644-8202-7a18217201e6",
+      "date": "2026-03-08",
+      "strain": 6,
+      "duration": null,
+      "recovery": null,
+      "source": "whoop-api"
+    }
+  ],
+  "lastSync": "2026-04-20T03:09:14.092Z",
+  "syncStats": {
+    "added": 2,
+    "preserved": 0,
+    "total": 2
+  }
 }
