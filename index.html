@@ -161,6 +161,7 @@
     <div class="flex gap-8 mb-20" style="align-items:center;flex-wrap:wrap;">
       <button class="pill s active" id="pill-singles" onclick="setType('singles')">Singles</button>
       <button class="pill d" id="pill-doubles" onclick="setType('doubles')">Doubles</button>
+      <button class="pill" id="pill-all" onclick="setType('all')">All</button>
       <div class="threshold-wrap">
         Flag threshold:
         <input type="number" class="threshold-inp" id="threshold-inp" value="15" min="1" max="21" step="0.5" oninput="renderDash()">
@@ -354,7 +355,7 @@ WHOOP_REFRESH_TOKEN  → token from Postman</div>
 <script>
 const STORAGE_KEY = 'bk-tennis-strain-PERMANENT';
 let sessions = [];
-let activeType = 'singles';
+let activeType = 'all';
 let manualType = 'singles';
 let lastSync = null;
 
@@ -381,7 +382,7 @@ function updateStatus(err) {
   const el = document.getElementById('storage-status');
   if (!el) return;
   if (err) { dot.style.background = '#E24B4A'; el.textContent = 'Storage error'; return; }
-  const tagged = sessions.filter(s => s.type !== null).length;
+  const tagged = sessions.filter(s => s.type === 'singles' || s.type === 'doubles').length;
   dot.style.background = '#3B6D11';
   el.textContent = sessions.length + ' sessions · ' + tagged + ' tagged';
 }
@@ -437,7 +438,8 @@ function setType(t) {
   activeType = t;
   document.getElementById('pill-singles').className = 'pill s' + (t === 'singles' ? ' active' : '');
   document.getElementById('pill-doubles').className = 'pill d' + (t === 'doubles' ? ' active' : '');
-  document.getElementById('type-label').textContent = t;
+  document.getElementById('pill-all').className = 'pill' + (t === 'all' ? ' active' : '');
+  document.getElementById('type-label').textContent = t === 'all' ? 'all sessions' : t;
   renderDash();
 }
 
@@ -490,7 +492,7 @@ function drawLine(id, datasets) {
 
 function renderDash() {
   const thr=parseFloat(document.getElementById('threshold-inp').value)||15;
-  const typed=sessions.filter(s=>s.type===activeType).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const typed=sessions.filter(s=>activeType==='all'?true:s.type===activeType).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const strains=typed.map(s=>s.strain);
   const avg=strains.length?(strains.reduce((a,b)=>a+b,0)/strains.length).toFixed(1):'—';
   const peak=strains.length?Math.max(...strains).toFixed(1):'—';
