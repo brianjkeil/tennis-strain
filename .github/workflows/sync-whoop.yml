@@ -31,11 +31,6 @@ jobs:
           const REFRESH_TOKEN = process.env.WHOOP_REFRESH_TOKEN;
           const TENNIS_SPORT_ID = 34;
 
-          if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
-            console.error('Missing required secrets.');
-            process.exit(1);
-          }
-
           function post(url, params) {
             return new Promise((resolve, reject) => {
               const body = new URLSearchParams(params).toString();
@@ -50,7 +45,7 @@ jobs:
                 }
               }, res => {
                 let data = '';
-                res.on('data', chunk => data += chunk);
+                res.on('data', c => data += c);
                 res.on('end', () => {
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
@@ -71,7 +66,7 @@ jobs:
                 headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
               }, res => {
                 let data = '';
-                res.on('data', chunk => data += chunk);
+                res.on('data', c => data += c);
                 res.on('end', () => {
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
@@ -101,8 +96,7 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            // Write new refresh token to file and GitHub output
-            fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
+            // Write to GITHUB_OUTPUT for next step to use
             if (process.env.GITHUB_OUTPUT) {
               fs.appendFileSync(process.env.GITHUB_OUTPUT, 'new_refresh_token=' + newRefreshToken + '\n');
             }
@@ -126,8 +120,7 @@ jobs:
               const records = resp.data.records || [];
               const tennis = records.filter(w => {
                 if (w.sport_id !== TENNIS_SPORT_ID) return false;
-                const d = new Date(w.start || w.created_at || '');
-                return d >= cutoff;
+                return new Date(w.start || w.created_at || '') >= cutoff;
               });
               allWorkouts = allWorkouts.concat(tennis);
               nextToken = resp.data.next_token || null;
@@ -166,73 +159,66 @@ jobs:
             });
 
             const merged = Array.from(existingMap.values()).sort((a, b) => new Date(a.date) - new Date(b.date));
-            const output = {
+            fs.writeFileSync('data.json', JSON.stringify({
               sessions: merged,
               lastSync: new Date().toISOString(),
               syncStats: { added, preserved, total: merged.length }
-            };
-            fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
+            }, null, 2));
             console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + merged.length + ' total.');
           }
 
           run().catch(e => { console.error(e); process.exit(1); });
           EOF
 
-      - name: Update WHOOP_REFRESH_TOKEN secret automatically
+      - name: Auto-update WHOOP_REFRESH_TOKEN secret
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
           NEW_TOKEN: ${{ steps.fetch.outputs.new_refresh_token }}
           REPO: ${{ github.repository }}
         run: |
           if [ -z "$NEW_TOKEN" ]; then
-            echo "No new refresh token to update."
+            echo "No new token to update."
             exit 0
           fi
-          echo "Updating WHOOP_REFRESH_TOKEN secret..."
 
-          # Get repo public key
+          echo "Fetching repo public key..."
           KEY_DATA=$(curl -s \
-            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Authorization: Bearer $PAT_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/secrets/public-key")
 
-          KEY_ID=$(echo "$KEY_DATA" | node -e "
-            let d='';
-            process.stdin.on('data',c=>d+=c);
-            process.stdin.on('end',()=>console.log(JSON.parse(d).key_id));
-          ")
+          KEY_ID=$(echo "$KEY_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['key_id'])")
+          PUB_KEY=$(echo "$KEY_DATA" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['key'])")
 
-          PUB_KEY=$(echo "$KEY_DATA" | node -e "
-            let d='';
-            process.stdin.on('data',c=>d+=c);
-            process.stdin.on('end',()=>console.log(JSON.parse(d).key));
-          ")
+          echo "Encrypting new refresh token..."
+          ENCRYPTED=$(python3 - <<PYEOF
+          import base64, sys
+          from nacl import encoding, public
 
-          # Install tweetsodium for encryption
-          npm install tweetsodium --no-save 2>/dev/null
-
-          ENCRYPTED=$(node -e "
-            const sodium = require('./node_modules/tweetsodium');
-            const key = Buffer.from('$PUB_KEY', 'base64');
-            const value = Buffer.from('$NEW_TOKEN');
-            const encrypted = sodium.seal(value, key);
-            console.log(Buffer.from(encrypted).toString('base64'));
-          ")
+          pub_key_bytes = base64.b64decode("$PUB_KEY")
+          box = public.SealedBox(public.PublicKey(pub_key_bytes))
+          encrypted = box.encrypt("$NEW_TOKEN".encode())
+          print(base64.b64encode(encrypted).decode())
+          PYEOF
+          )
 
           if [ -z "$ENCRYPTED" ]; then
-            echo "Encryption failed — new token saved to new-refresh-token.txt, update secret manually."
+            echo "Encryption failed."
+            exit 1
+          fi
+
+          echo "Updating secret..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            -H "Authorization: Bearer $PAT_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/secrets/WHOOP_REFRESH_TOKEN" \
+            -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}")
+
+          if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "201" ]; then
+            echo "WHOOP_REFRESH_TOKEN updated successfully. Token rotation is now fully automated."
           else
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PUT \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "https://api.github.com/repos/$REPO/actions/secrets/WHOOP_REFRESH_TOKEN" \
-              -d "{\"encrypted_value\":\"$ENCRYPTED\",\"key_id\":\"$KEY_ID\"}")
-            if [ "$HTTP_STATUS" = "204" ] || [ "$HTTP_STATUS" = "201" ]; then
-              echo "WHOOP_REFRESH_TOKEN secret updated successfully."
-              rm -f new-refresh-token.txt
-            else
-              echo "Secret update returned HTTP $HTTP_STATUS — token saved to new-refresh-token.txt instead."
-            fi
+            echo "Secret update failed with HTTP $HTTP_STATUS."
+            exit 1
           fi
 
       - name: Commit data.json to repo
@@ -240,6 +226,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git add new-refresh-token.txt 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: sync WHOOP tennis data $(date -u '+%Y-%m-%d')"
           git push
