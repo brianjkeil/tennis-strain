@@ -8,15 +8,12 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Fetch WHOOP data and write data.json
-        id: fetch
         env:
           WHOOP_CLIENT_ID: ${{ secrets.WHOOP_CLIENT_ID }}
           WHOOP_CLIENT_SECRET: ${{ secrets.WHOOP_CLIENT_SECRET }}
@@ -29,25 +26,33 @@ jobs:
           const CLIENT_ID     = process.env.WHOOP_CLIENT_ID;
           const CLIENT_SECRET = process.env.WHOOP_CLIENT_SECRET;
           const REFRESH_TOKEN = process.env.WHOOP_REFRESH_TOKEN;
-          const TENNIS_SPORT_ID = 34;
+
+          if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
+            console.error('Missing required secrets.');
+            process.exit(1);
+          }
 
           function post(url, params) {
             return new Promise((resolve, reject) => {
               const body = new URLSearchParams(params).toString();
               const u = new URL(url);
-              const req = https.request({
-                hostname: u.hostname, port: 443, path: u.pathname,
+              const options = {
+                hostname: u.hostname,
+                port: 443,
+                path: u.pathname,
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',
                   'Content-Length': Buffer.byteLength(body),
                   'Accept': 'application/json'
                 }
-              }, res => {
+              };
+              const req = https.request(options, res => {
                 let data = '';
-                res.on('data', c => data += c);
+                res.on('data', chunk => data += chunk);
                 res.on('end', () => {
                   console.log('POST status:', res.statusCode);
+                  console.log('POST response:', data.substring(0, 500));
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
                 });
@@ -61,13 +66,19 @@ jobs:
           function get(url, token) {
             return new Promise((resolve, reject) => {
               const u = new URL(url);
-              const req = https.request({
-                hostname: u.hostname, port: 443,
-                path: u.pathname + u.search, method: 'GET',
-                headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-              }, res => {
+              const options = {
+                hostname: u.hostname,
+                port: 443,
+                path: u.pathname + u.search,
+                method: 'GET',
+                headers: {
+                  'Authorization': 'Bearer ' + token,
+                  'Accept': 'application/json'
+                }
+              };
+              const req = https.request(options, res => {
                 let data = '';
-                res.on('data', c => data += c);
+                res.on('data', chunk => data += chunk);
                 res.on('end', () => {
                   try { resolve({ status: res.statusCode, data: JSON.parse(data) }); }
                   catch(e) { reject(new Error('JSON parse error: ' + data)); }
@@ -85,6 +96,7 @@ jobs:
               refresh_token: REFRESH_TOKEN,
               client_id: CLIENT_ID,
               client_secret: CLIENT_SECRET,
+              redirect_uri: 'https://oauth.pstmn.io/v1/browser-callback',
               scope: 'offline'
             });
 
@@ -97,13 +109,7 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            fs.writeFileSync('/tmp/new_refresh_token.txt', newRefreshToken);
-
-            if (process.env.GITHUB_OUTPUT) {
-              fs.appendFileSync(process.env.GITHUB_OUTPUT, 'new_refresh_token=' + newRefreshToken + '\n');
-            }
-
-            console.log('Fetching tennis workouts (sport_id=' + TENNIS_SPORT_ID + ')...');
+            console.log('Fetching tennis workouts...');
             const cutoff = new Date('2026-01-01T00:00:00Z');
             let allWorkouts = [];
             let nextToken = null;
@@ -120,17 +126,22 @@ jobs:
               }
 
               const records = resp.data.records || [];
+              console.log('Page ' + (pages + 1) + ': ' + records.length + ' workouts');
+
               const tennis = records.filter(w => {
-                if (w.sport_id !== TENNIS_SPORT_ID) return false;
-                return new Date(w.start || w.created_at || '') >= cutoff;
+                if (w.sport_id !== 63) return false;
+                const d = new Date(w.start || w.created_at || '');
+                return d >= cutoff;
               });
               allWorkouts = allWorkouts.concat(tennis);
+
               nextToken = resp.data.next_token || null;
               pages++;
 
               const oldest = records[records.length - 1];
               if (oldest && new Date(oldest.start || oldest.created_at || '') < cutoff) break;
               if (pages > 20) break;
+
             } while (nextToken);
 
             console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
@@ -140,25 +151,30 @@ jobs:
               const dateStr = d.toISOString().split('T')[0];
               const strain = w.score && w.score.strain ? Math.round(w.score.strain * 10) / 10 : 0;
               return {
-                id: 'whoop-api-' + (w.id || w.workout_id),
+                id: 'whoop-api-' + w.id,
                 date: dateStr,
-                strain,
-                type: null,
+                strain: strain,
                 duration: null,
                 recovery: null,
+                type: null,
                 source: 'whoop-api'
               };
             });
 
             let existingData = { sessions: [], lastSync: null };
-            try { existingData = JSON.parse(fs.readFileSync('data.json', 'utf8')); }
-            catch(e) { console.log('No existing data.json — creating fresh.'); }
+            try {
+              const raw = fs.readFileSync('data.json', 'utf8');
+              existingData = JSON.parse(raw);
+            } catch(e) {
+              console.log('No existing data.json — creating fresh.');
+            }
 
+            // Read tags.json if it exists — these are tags written by the browser app
             let tags = {};
             try {
               tags = JSON.parse(fs.readFileSync('tags.json', 'utf8'));
               console.log('Found tags.json with ' + Object.keys(tags).length + ' tags.');
-            } catch(e) { console.log('No tags.json found.'); }
+            } catch(e) { console.log('No tags.json — none needed.'); }
 
             const existingMap = new Map((existingData.sessions || []).map(s => [s.id, s]));
             let added = 0, preserved = 0;
@@ -167,96 +183,40 @@ jobs:
               else { existingMap.set(s.id, s); added++; }
             });
 
+            // Apply tags and sort
             const merged = Array.from(existingMap.values()).map(s => {
               if (tags[s.id]) return { ...s, type: tags[s.id] };
               return s;
             }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            fs.writeFileSync('data.json', JSON.stringify({
+            const output = {
               sessions: merged,
               lastSync: new Date().toISOString(),
               syncStats: { added, preserved, total: merged.length }
-            }, null, 2));
+            };
+
+            fs.writeFileSync('data.json', JSON.stringify(output, null, 2));
             console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + merged.length + ' total.');
 
+            // Reset tags.json after merging so we don't re-apply stale tags
             if (Object.keys(tags).length > 0) {
               fs.writeFileSync('tags.json', JSON.stringify({}));
               console.log('tags.json reset after merge.');
+            }
+
+            if (newRefreshToken && newRefreshToken !== REFRESH_TOKEN) {
+              fs.writeFileSync('new-refresh-token.txt', newRefreshToken);
+              console.log('WARNING: Refresh token rotated. Update WHOOP_REFRESH_TOKEN secret with value in new-refresh-token.txt');
             }
           }
 
           run().catch(e => { console.error(e); process.exit(1); });
           EOF
 
-      - name: Auto-update WHOOP_REFRESH_TOKEN secret
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          NEW_TOKEN=$(cat /tmp/new_refresh_token.txt 2>/dev/null)
-          if [ -z "$NEW_TOKEN" ]; then
-            echo "No new token found."
-            exit 0
-          fi
-          echo "Updating WHOOP_REFRESH_TOKEN secret..."
-
-          KEY_DATA=$(curl -s \
-            -H "Authorization: Bearer $PAT_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/actions/secrets/public-key")
-
-          echo "GitHub API response: $KEY_DATA"
-
-          KEY_ID=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('key_id',''))" 2>/dev/null)
-          PUB_KEY=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('key',''))" 2>/dev/null)
-
-          if [ -z "$KEY_ID" ] || [ -z "$PUB_KEY" ]; then
-            echo "Could not get public key — PAT_TOKEN may lack permissions."
-            echo "Saving token to new-refresh-token.txt as fallback."
-            echo "$NEW_TOKEN" > new-refresh-token.txt
-            exit 0
-          fi
-
-          echo "Got key ID: $KEY_ID"
-          pip install PyNaCl --break-system-packages -q
-
-          python3 << PYEOF
-          import base64, os, json, urllib.request, urllib.error
-          from nacl import public
-
-          pub_key_b64 = "$PUB_KEY"
-          key_id = "$KEY_ID"
-          new_token = open('/tmp/new_refresh_token.txt').read().strip()
-          pat = os.environ['PAT_TOKEN']
-          repo = os.environ['REPO']
-
-          pub_key_bytes = base64.b64decode(pub_key_b64)
-          box = public.SealedBox(public.PublicKey(pub_key_bytes))
-          encrypted = box.encrypt(new_token.encode())
-          encrypted_b64 = base64.b64encode(encrypted).decode()
-
-          payload = json.dumps({"encrypted_value": encrypted_b64, "key_id": key_id}).encode()
-          req = urllib.request.Request(
-            f"https://api.github.com/repos/{repo}/actions/secrets/WHOOP_REFRESH_TOKEN",
-            data=payload, method="PUT",
-            headers={
-              "Authorization": f"Bearer {pat}",
-              "Accept": "application/vnd.github+json",
-              "Content-Type": "application/json"
-            }
-          )
-          try:
-            urllib.request.urlopen(req)
-            print("WHOOP_REFRESH_TOKEN updated successfully.")
-          except urllib.error.HTTPError as e:
-            print("Failed:", e.code, e.read().decode())
-            raise SystemExit(1)
-          PYEOF
-
       - name: Commit data.json to repo
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json tags.json new-refresh-token.txt 2>/dev/null || true
+          git add data.json
           git diff --staged --quiet || git commit -m "chore: sync WHOOP tennis data $(date -u '+%Y-%m-%d')"
           git push
