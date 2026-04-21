@@ -97,7 +97,6 @@ jobs:
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
 
-            // Write new token to file for next step to read directly
             fs.writeFileSync('/tmp/new_refresh_token.txt', newRefreshToken);
 
             if (process.env.GITHUB_OUTPUT) {
@@ -201,23 +200,29 @@ jobs:
           fi
           echo "Updating WHOOP_REFRESH_TOKEN secret..."
 
-          # Get repo public key
           KEY_DATA=$(curl -s \
             -H "Authorization: Bearer $PAT_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$REPO/actions/secrets/public-key")
 
-          KEY_ID=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['key_id'])")
-          PUB_KEY=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['key'])")
+          echo "GitHub API response: $KEY_DATA"
 
-          echo "Key ID: $KEY_ID"
-          echo "Public key length: ${#PUB_KEY}"
+          KEY_ID=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('key_id',''))" 2>/dev/null)
+          PUB_KEY=$(echo "$KEY_DATA" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('key',''))" 2>/dev/null)
 
-          # Install PyNaCl and encrypt
+          if [ -z "$KEY_ID" ] || [ -z "$PUB_KEY" ]; then
+            echo "Could not get public key — PAT_TOKEN may lack permissions."
+            echo "Saving token to new-refresh-token.txt as fallback."
+            echo "$NEW_TOKEN" > new-refresh-token.txt
+            exit 0
+          fi
+
+          echo "Got key ID: $KEY_ID"
           pip install PyNaCl --break-system-packages -q
 
           python3 << PYEOF
           import base64, os, json, urllib.request, urllib.error
+          from nacl import public
 
           pub_key_b64 = "$PUB_KEY"
           key_id = "$KEY_ID"
@@ -225,7 +230,6 @@ jobs:
           pat = os.environ['PAT_TOKEN']
           repo = os.environ['REPO']
 
-          from nacl import public, encoding
           pub_key_bytes = base64.b64decode(pub_key_b64)
           box = public.SealedBox(public.PublicKey(pub_key_bytes))
           encrypted = box.encrypt(new_token.encode())
@@ -253,6 +257,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json tags.json
+          git add data.json tags.json new-refresh-token.txt 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: sync WHOOP tennis data $(date -u '+%Y-%m-%d')"
           git push
