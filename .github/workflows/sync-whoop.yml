@@ -210,8 +210,63 @@ jobs:
           }
 
           run().catch(e => { console.error(e); process.exit(1); });
-          EOF
-
+          EOF  
+      - name: Auto-update WHOOP_REFRESH_TOKEN secret
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+          NEW_TOKEN: ${{ steps.fetch.outputs.new_refresh_token }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$NEW_TOKEN" ]; then
+            echo "No new token to update."
+            exit 0
+          fi
+          KEY_DATA=$(curl -s \
+            -H "Authorization: Bearer $PAT_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/secrets/public-key")
+          KEY_ID=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key_id))")
+          PUB_KEY=$(echo "$KEY_DATA" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).key))")
+          npm install libsodium-wrappers --no-save 2>/dev/null
+          NEW_TOKEN="$NEW_TOKEN" PUB_KEY="$PUB_KEY" KEY_ID="$KEY_ID" PAT_TOKEN="$PAT_TOKEN" REPO="$REPO" node - <<'JSEOF'
+          const sodium = require('./node_modules/libsodium-wrappers');
+          const https = require('https');
+          async function run() {
+            await sodium.ready;
+            const pubKey = Buffer.from(process.env.PUB_KEY, 'base64');
+            const secret = Buffer.from(process.env.NEW_TOKEN);
+            const encrypted = sodium.crypto_box_seal(secret, pubKey);
+            const encryptedB64 = Buffer.from(encrypted).toString('base64');
+            const payload = JSON.stringify({ encrypted_value: encryptedB64, key_id: process.env.KEY_ID });
+            return new Promise((resolve, reject) => {
+              const req = https.request({
+                hostname: 'api.github.com', port: 443,
+                path: '/repos/' + process.env.REPO + '/actions/secrets/WHOOP_REFRESH_TOKEN',
+                method: 'PUT',
+                headers: {
+                  'Authorization': 'Bearer ' + process.env.PAT_TOKEN,
+                  'Accept': 'application/vnd.github+json',
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(payload),
+                  'User-Agent': 'github-actions'
+                }
+              }, res => {
+                console.log('Secret update status:', res.statusCode);
+                if (res.statusCode === 204 || res.statusCode === 201) {
+                  console.log('WHOOP_REFRESH_TOKEN updated successfully.');
+                } else {
+                  let body = '';
+                  res.on('data', c => body += c);
+                  res.on('end', () => { console.error('Failed:', body); process.exit(1); });
+                }
+              });
+              req.on('error', reject);
+              req.write(payload);
+              req.end();
+            });
+          }
+          run().catch(e => { console.error(e); process.exit(1); });
+          JSEOF
       - name: Commit data.json to repo
         run: |
           git config user.name "github-actions[bot]"
