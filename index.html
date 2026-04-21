@@ -395,8 +395,8 @@ function setType(t) {
   document.getElementById('pill-singles').className = 'pill s'+(t==='singles'?' active':'');
   document.getElementById('pill-doubles').className = 'pill d'+(t==='doubles'?' active':'');
   document.getElementById('type-label').textContent = t==='all'?'all sessions':t;
-  loadThreshold();
-  renderDash();
+  const thr = loadThreshold();
+  renderDash(thr);
 }
 
 function setManualType(t) {
@@ -448,8 +448,8 @@ function drawLine(id, datasets) {
 }
 
 // ── Dashboard ────────────────────────────────────────────────────────────────
-function renderDash() {
-  const thr=parseFloat(document.getElementById('threshold-inp').value)||15;
+function renderDash(forcedThr) {
+  const thr=forcedThr||parseFloat(document.getElementById('threshold-inp').value)||15;
   const typed=sessions
     .filter(s=>activeType==='all'||s.type===activeType)
     .sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -628,12 +628,14 @@ function saveThreshold() {
 }
 
 function loadThreshold() {
+  let val = '15';
   try {
-    const val = localStorage.getItem('bk-threshold-' + activeType);
-    document.getElementById('threshold-inp').value = val || '15';
-  } catch(e) {
-    document.getElementById('threshold-inp').value = '15';
-  }
+    const stored = localStorage.getItem('bk-threshold-' + activeType);
+    if (stored) val = stored;
+  } catch(e) {}
+  const el = document.getElementById('threshold-inp');
+  el.value = val;
+  return parseFloat(val) || 15;
 }
 
 // Boot
