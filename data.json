@@ -776,12 +776,21 @@
       "recovery": null,
       "source": "whoop-api",
       "type": "doubles"
+    },
+    {
+      "id": "whoop-api-f6a693b3-836e-45fa-acf1-2673d9b7a171",
+      "date": "2026-04-21",
+      "strain": 15.1,
+      "type": null,
+      "duration": null,
+      "recovery": null,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-04-21T23:04:18.080Z",
+  "lastSync": "2026-04-21T23:15:28.873Z",
   "syncStats": {
-    "added": 0,
-    "preserved": 2,
-    "total": 89
+    "added": 1,
+    "preserved": 87,
+    "total": 88
   }
 }
