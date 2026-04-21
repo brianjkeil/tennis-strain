@@ -6,7 +6,8 @@
       "strain": 11.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-186e5b55-637f-4631-875d-e55c1a6a4222",
@@ -14,7 +15,8 @@
       "strain": 11,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-7c999860-f201-4e1b-9303-ab69bdf156f0",
@@ -22,7 +24,8 @@
       "strain": 13.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-ebebb750-97a7-4581-9aa5-4e7c5bce8696",
@@ -30,7 +33,8 @@
       "strain": 10.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-f2ddde2b-2059-46e8-bbc8-ae122c446ff5",
@@ -38,7 +42,8 @@
       "strain": 15.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-641a2881-499e-4392-ba26-620482477d5d",
@@ -46,7 +51,8 @@
       "strain": 14.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-27453dab-479a-45d4-8c3d-68bddb91322f",
@@ -54,7 +60,8 @@
       "strain": 12.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-c59de19f-cf5f-4f29-a0e1-fff98180edee",
@@ -70,7 +77,8 @@
       "strain": 15.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-5261d67b-234f-4cbd-b582-048f75e4f245",
@@ -78,7 +86,8 @@
       "strain": 11.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-64607f65-1502-4507-bea3-cac6f6783c7f",
@@ -86,7 +95,8 @@
       "strain": 10.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-bf4f99d7-116b-43f7-8a27-f71a6f28d2a6",
@@ -94,7 +104,8 @@
       "strain": 12.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-2ad2719b-bc0e-44a2-93fa-65228290940a",
@@ -102,7 +113,8 @@
       "strain": 12.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-f337dccc-882b-49d8-837c-b35ae1ccd090",
@@ -110,7 +122,8 @@
       "strain": 15.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-66db183e-3e35-4e52-a79e-a335f9ec1130",
@@ -118,7 +131,8 @@
       "strain": 15,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-5c320be1-d19c-4e8a-ac31-fd9add793762",
@@ -126,7 +140,8 @@
       "strain": 13.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-dff772d7-1d58-4914-b1ac-9c62c4b6c36a",
@@ -134,7 +149,8 @@
       "strain": 11.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-93c62c7f-8006-4e3c-a03f-4b7781903131",
@@ -142,7 +158,8 @@
       "strain": 12.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-e4db3744-7b92-4b49-81e2-e4da688c804c",
@@ -150,7 +167,8 @@
       "strain": 12.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-1e59bc8d-6a65-48da-b7b7-9234f8ef7536",
@@ -158,7 +176,8 @@
       "strain": 15.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-f8243c7d-7066-4110-ad51-839e16b5c3ff",
@@ -166,7 +185,8 @@
       "strain": 16,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-d44fbaa9-6968-438f-b425-f1c05a1d346a",
@@ -174,7 +194,8 @@
       "strain": 9.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-325c3c21-d224-4549-bd2c-6bc40a4868eb",
@@ -182,7 +203,8 @@
       "strain": 16.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-b158070c-e34e-4135-b436-63808d04081d",
@@ -190,7 +212,8 @@
       "strain": 9.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-fcbdb26e-1ba9-4400-85b4-569b14f8f8f9",
@@ -198,7 +221,8 @@
       "strain": 12.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-cc17bf3d-fb01-4c38-9002-a16a5e12a42a",
@@ -206,7 +230,8 @@
       "strain": 16.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-4f4c0348-8979-4157-b213-2e1f7c48e6d6",
@@ -214,7 +239,8 @@
       "strain": 14.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-776999db-2e0b-41f5-b60e-a85fac08f506",
@@ -222,7 +248,8 @@
       "strain": 15.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-d6dc22a9-d7ce-45cf-9a59-78b1930f88ac",
@@ -230,7 +257,8 @@
       "strain": 15.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-bc2d32a1-ea82-40a3-a2e5-ca47937d3ff6",
@@ -238,7 +266,8 @@
       "strain": 15.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-c09d4100-6df9-4ff6-8748-9056ecfbd76f",
@@ -246,7 +275,8 @@
       "strain": 15.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-5185bdda-4152-4f4f-be74-2abe72014a24",
@@ -254,7 +284,8 @@
       "strain": 14.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-e2a84c07-7ba9-4950-a4ad-43fc2c7fe416",
@@ -262,7 +293,8 @@
       "strain": 14.2,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-6740407b-b052-4db4-963b-548314ecf2ef",
@@ -270,7 +302,8 @@
       "strain": 9.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-63f18f89-fed7-4c02-badb-d855621d6ee9",
@@ -278,7 +311,8 @@
       "strain": 10,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-27fbe86b-50d3-491c-9c5e-170c8ecc9f6e",
@@ -286,7 +320,8 @@
       "strain": 11.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-21ece493-1928-48c9-9927-861e5e76ec60",
@@ -294,7 +329,8 @@
       "strain": 14.2,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-b1df9ef9-f94c-4ae8-9f89-62abf71b86af",
@@ -302,7 +338,8 @@
       "strain": 16.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-1fe09c81-20cc-4777-b7ae-1987249fd240",
@@ -310,7 +347,8 @@
       "strain": 16.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-c243ebf9-8438-427c-a68d-70a4399edcb2",
@@ -318,7 +356,8 @@
       "strain": 12.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-b14ecf44-db17-4bb0-95b2-7fb0215b63a4",
@@ -326,7 +365,8 @@
       "strain": 12.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-bd443357-0d81-43b4-89f4-55e4fee6dcfd",
@@ -334,7 +374,8 @@
       "strain": 16.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-71fe2078-685a-4d18-8dd7-6ea01cba57a4",
@@ -342,7 +383,8 @@
       "strain": 11.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-04788c01-32ba-4ba6-92ec-2be9a0e6f25f",
@@ -358,7 +400,8 @@
       "strain": 12.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-15a5f0b5-e623-407f-bdd6-a9778ecd22a4",
@@ -374,6 +417,16 @@
       "strain": 10.8,
       "duration": null,
       "recovery": null,
+      "source": "whoop-api",
+      "type": "singles"
+    },
+    {
+      "id": "whoop-api-9c7d402c-85c1-4c73-8cf7-a3e976f9474f",
+      "date": "2026-03-02",
+      "strain": 10.5,
+      "duration": null,
+      "recovery": null,
+      "type": null,
       "source": "whoop-api"
     },
     {
@@ -382,7 +435,8 @@
       "strain": 14.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-eb938d2c-c91a-42c2-a443-96872c1bb3ec",
@@ -390,7 +444,8 @@
       "strain": 13.6,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-bf577f1f-9911-4f49-9368-fa8d86e0cb6b",
@@ -398,7 +453,8 @@
       "strain": 14.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-c5c6b090-3412-4a83-a1e4-5ec6a41c5a21",
@@ -406,7 +462,8 @@
       "strain": 13.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-acbc74b6-85f4-4ccf-adc3-1c029aa427d9",
@@ -414,7 +471,8 @@
       "strain": 11.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-faca6c85-f09b-4415-9540-8c8d80899ba8",
@@ -422,6 +480,16 @@
       "strain": 10.2,
       "duration": null,
       "recovery": null,
+      "source": "whoop-api",
+      "type": "singles"
+    },
+    {
+      "id": "whoop-api-af3c7874-dd30-4644-8202-7a18217201e6",
+      "date": "2026-03-08",
+      "strain": 6,
+      "duration": null,
+      "recovery": null,
+      "type": null,
       "source": "whoop-api"
     },
     {
@@ -430,7 +498,8 @@
       "strain": 15.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-be537167-d022-4de4-a2b6-e2546bdf4efe",
@@ -438,7 +507,8 @@
       "strain": 10.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-a553d90b-3b2f-484e-98e4-54c7cd40958a",
@@ -446,7 +516,8 @@
       "strain": 13.2,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-d11635cf-eb7c-441e-9fa3-bb86c9f010f7",
@@ -454,7 +525,8 @@
       "strain": 7.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-b19f3759-669c-4fd9-b5dc-d91836fbc1b8",
@@ -462,7 +534,8 @@
       "strain": 14.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-b59bf204-9a98-43b7-b8a9-d7d7c3bf01b2",
@@ -470,7 +543,8 @@
       "strain": 13.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-b9f439f9-9309-460a-9682-9b3d1abe9380",
@@ -478,7 +552,8 @@
       "strain": 14.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-25036f3a-8b8f-4673-bd45-cbcf0f6a3b90",
@@ -494,7 +569,8 @@
       "strain": 9.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-8d58111d-08b1-41d0-81b6-e4ea8e36cc7a",
@@ -502,7 +578,8 @@
       "strain": 13,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-fcff2baa-5ba1-455f-983c-3162fbdeca0e",
@@ -510,7 +587,8 @@
       "strain": 13.6,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-65143aee-a28f-4369-9a73-04c8d1aed798",
@@ -518,7 +596,8 @@
       "strain": 13.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-1d0b795f-a746-4978-beac-94578644dd65",
@@ -526,7 +605,8 @@
       "strain": 13.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-697dea58-6891-4640-a47f-458276be09f3",
@@ -534,7 +614,8 @@
       "strain": 10.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-88db85ab-eb78-4313-a03f-201a7893ab2b",
@@ -542,7 +623,8 @@
       "strain": 12.6,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-90e2e4fc-f471-43d8-a952-439081c38983",
@@ -550,7 +632,8 @@
       "strain": 9.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-39deef3d-4cf6-4eed-af09-0d650c6f37e7",
@@ -558,7 +641,8 @@
       "strain": 11.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-9ac9ed3c-3502-450f-9dce-b54adaf37786",
@@ -574,7 +658,8 @@
       "strain": 8.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-7d326b73-bd4c-4dfc-9df8-6d306338df39",
@@ -582,7 +667,8 @@
       "strain": 8.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-b107b0d6-e999-4ee4-b46d-74508aa348c2",
@@ -590,7 +676,8 @@
       "strain": 12.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-f0e4c20f-28a2-4460-b602-071157403539",
@@ -606,7 +693,8 @@
       "strain": 6.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-e5bbee4b-7e22-4d89-8f22-a6fe8bc9be92",
@@ -614,7 +702,8 @@
       "strain": 8.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-93edf3bb-d0f1-4396-9085-7faeeaccc54b",
@@ -622,7 +711,8 @@
       "strain": 10.9,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-9b86f159-1357-4e03-a78d-eed8e1ece72f",
@@ -630,7 +720,8 @@
       "strain": 11.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-03254381-cde8-47ec-bf8c-0a53c039c669",
@@ -638,7 +729,8 @@
       "strain": 14.5,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-ebbb2123-0b9a-4075-9b06-241d93e87414",
@@ -646,7 +738,8 @@
       "strain": 13.2,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-a4929c1d-777b-4914-bb68-bba2631d9f6c",
@@ -654,7 +747,8 @@
       "strain": 8.7,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-2253552a-1c7e-419f-bfa4-959fe37ca5f4",
@@ -662,7 +756,8 @@
       "strain": 8.1,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-4cb00da0-ac7c-4b8a-9ebf-7c55e714764d",
@@ -670,7 +765,8 @@
       "strain": 11.2,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-183a6273-72e9-4866-ac57-230f4722add0",
@@ -686,7 +782,8 @@
       "strain": 14.3,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "singles"
     },
     {
       "id": "whoop-api-216bdc26-a99a-4bc2-913f-17a292e2aceb",
@@ -694,13 +791,14 @@
       "strain": 10.8,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     }
   ],
-  "lastSync": "2026-04-20T16:05:18.906Z",
+  "lastSync": "2026-04-21T17:12:29.214Z",
   "syncStats": {
-    "added": 0,
-    "preserved": 87,
-    "total": 87
+    "added": 2,
+    "preserved": 0,
+    "total": 89
   }
 }
