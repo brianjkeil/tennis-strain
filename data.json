@@ -392,7 +392,8 @@
       "strain": 9.4,
       "duration": null,
       "recovery": null,
-      "source": "whoop-api"
+      "source": "whoop-api",
+      "type": "doubles"
     },
     {
       "id": "whoop-api-9537b320-87d7-460f-ab88-7f93c640c166",
@@ -795,10 +796,10 @@
       "type": "doubles"
     }
   ],
-  "lastSync": "2026-04-21T17:12:29.214Z",
+  "lastSync": "2026-04-21T23:04:18.080Z",
   "syncStats": {
-    "added": 2,
-    "preserved": 0,
+    "added": 0,
+    "preserved": 2,
     "total": 89
   }
 }
