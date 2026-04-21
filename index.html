@@ -136,7 +136,7 @@
       <button class="pill d" id="pill-doubles" onclick="setType('doubles')">Doubles</button>
       <div class="threshold-wrap">
         Flag threshold:
-        <input type="number" class="threshold-inp" id="threshold-inp" value="15" min="1" max="21" step="0.5" oninput="renderDash()">
+        <input type="number" class="threshold-inp" id="threshold-inp" value="15" min="1" max="21" step="0.5" oninput="saveThreshold();renderDash()">
       </div>
     </div>
     <div class="stats-grid">
@@ -395,6 +395,7 @@ function setType(t) {
   document.getElementById('pill-singles').className = 'pill s'+(t==='singles'?' active':'');
   document.getElementById('pill-doubles').className = 'pill d'+(t==='doubles'?' active':'');
   document.getElementById('type-label').textContent = t==='all'?'all sessions':t;
+  loadThreshold();
   renderDash();
 }
 
@@ -621,8 +622,23 @@ function handleCSV(input){
 
 window.addEventListener('resize',()=>renderDash());
 
+function saveThreshold() {
+  const val = document.getElementById('threshold-inp').value;
+  try { localStorage.setItem('bk-threshold-' + activeType, val); } catch(e) {}
+}
+
+function loadThreshold() {
+  try {
+    const val = localStorage.getItem('bk-threshold-' + activeType);
+    document.getElementById('threshold-inp').value = val || '15';
+  } catch(e) {
+    document.getElementById('threshold-inp').value = '15';
+  }
+}
+
 // Boot
 load();
+loadThreshold();
 updateStatus();
 renderDash();
 fetchDataJson();
