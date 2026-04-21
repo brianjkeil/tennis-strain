@@ -63,7 +63,7 @@
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
   .legend-box { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
   .legend-line { width: 16px; height: 2px; display: inline-block; border-radius: 1px; }
-  .session-grid { display: grid; grid-template-columns: 1fr 76px 76px 90px 32px; gap: 8px; align-items: center; }
+  .session-grid { display: grid; grid-template-columns: 1fr 76px 60px 76px 90px 32px; gap: 8px; align-items: center; }
   .session-header { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 4px 8px; border-bottom: 1px solid var(--border); }
   .session-row { padding: 9px 4px; border-bottom: 1px solid var(--border); font-size: 13px; }
   .session-row:last-child { border-bottom: none; }
@@ -412,38 +412,91 @@ function rolling(arr, n) {
 
 function drawBar(id, data, threshold) {
   const canvas=document.getElementById(id); if(!canvas) return;
-  const dpr=window.devicePixelRatio||1, W=canvas.offsetWidth||400, H=canvas.offsetHeight||130;
+  const dpr=window.devicePixelRatio||1, W=canvas.offsetWidth||400, H=200;
   canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
   const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
   if(!data.length){ctx.fillStyle='#888';ctx.font='12px sans-serif';ctx.fillText('No data yet',10,H/2);return;}
-  const max=Math.max(...data.map(d=>d.y),threshold||0)*1.1;
-  const bw=Math.max(2,(W/data.length)-2);
+
+  const PAD_L=36, PAD_R=8, PAD_T=10, PAD_B=24;
+  const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
+  const max=Math.ceil(Math.max(...data.map(d=>d.y),threshold||0)*1.1);
+  const ticks=[0,5,10,15,20].filter(v=>v<=max+1);
+
+  ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='right';
+  ticks.forEach(v=>{
+    const y=PAD_T+cH-(v/max)*cH;
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
+    ctx.fillStyle='#9ca3af'; ctx.fillText(v,PAD_L-4,y+3.5);
+  });
+
+  ctx.save();
+  ctx.translate(11,PAD_T+cH/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillStyle='#9ca3af'; ctx.font='10px -apple-system,sans-serif';
+  ctx.fillText('Strain',0,0); ctx.restore();
+
+  ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T); ctx.lineTo(PAD_L,PAD_T+cH); ctx.stroke();
+
+  const bw=Math.max(2,(cW/data.length)-1.5);
   data.forEach((d,i)=>{
-    const bh=Math.max(2,(d.y/max)*(H-12));
-    ctx.fillStyle=(threshold&&d.y>threshold)?'#E24B4A':'#378ADD'; ctx.globalAlpha=0.85;
+    const bh=Math.max(2,(d.y/max)*cH);
+    const x=PAD_L+i*(bw+1.5), y=PAD_T+cH-bh;
+    ctx.fillStyle=(threshold&&d.y>threshold)?'#E24B4A':'#378ADD'; ctx.globalAlpha=0.82;
     ctx.beginPath();
-    if(ctx.roundRect) ctx.roundRect(i*(bw+2)+1,H-bh-4,bw,bh,2); else ctx.rect(i*(bw+2)+1,H-bh-4,bw,bh);
+    if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,1.5); else ctx.rect(x,y,bw,bh);
     ctx.fill();
   });
   ctx.globalAlpha=1;
-  if(threshold){const ty=H-(threshold/max)*(H-12)-4;ctx.strokeStyle='#E24B4A';ctx.lineWidth=1;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(0,ty);ctx.lineTo(W,ty);ctx.stroke();ctx.setLineDash([]);}
+
+  if(threshold){
+    const ty=PAD_T+cH-(threshold/max)*cH;
+    ctx.strokeStyle='#E24B4A'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(PAD_L,ty); ctx.lineTo(W-PAD_R,ty); ctx.stroke(); ctx.setLineDash([]);
+  }
 }
 
 function drawLine(id, datasets) {
   const canvas=document.getElementById(id); if(!canvas) return;
-  const dpr=window.devicePixelRatio||1, W=canvas.offsetWidth||400, H=canvas.offsetHeight||130;
+  const dpr=window.devicePixelRatio||1, W=canvas.offsetWidth||400, H=200;
   canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.height=H+'px';
   const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
   const allV=datasets.flatMap(d=>d.data.map(p=>p.y)).filter(Boolean);
   if(!allV.length) return;
-  const min=Math.min(...allV)*0.9, max=Math.max(...allV)*1.05;
-  const px=(i,len)=>len<=1?W/2:(i/(len-1))*W;
-  const py=v=>H-((v-min)/(max-min||1))*(H-16)-4;
+
+  const PAD_L=36, PAD_R=8, PAD_T=10, PAD_B=24;
+  const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
+  const fixedMin=0, fixedMax=Math.ceil(Math.max(...allV,20)*1.05);
+  const ticks=[0,5,10,15,20].filter(v=>v<=fixedMax+1);
+
+  ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='right';
+  ticks.forEach(v=>{
+    const y=PAD_T+cH-((v-fixedMin)/(fixedMax-fixedMin))*cH;
+    if(y<PAD_T-2||y>PAD_T+cH+2) return;
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
+    ctx.fillStyle='#9ca3af'; ctx.fillText(v,PAD_L-4,y+3.5);
+  });
+
+  ctx.save();
+  ctx.translate(11,PAD_T+cH/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center'; ctx.fillStyle='#9ca3af'; ctx.font='10px -apple-system,sans-serif';
+  ctx.fillText('Strain',0,0); ctx.restore();
+
+  ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T); ctx.lineTo(PAD_L,PAD_T+cH); ctx.stroke();
+
+  const px=(i,len)=>PAD_L+(len<=1?cW/2:(i/(len-1))*cW);
+  const py=v=>PAD_T+cH-((v-fixedMin)/(fixedMax-fixedMin))*cH;
+
   datasets.forEach(ds=>{
     if(!ds.data.length) return;
-    ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=ds.width||1.5;ctx.globalAlpha=ds.alpha||1;
+    ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=ds.width||1.5; ctx.globalAlpha=ds.alpha||1;
+    ctx.lineJoin='round';
     ds.data.forEach((p,i)=>i===0?ctx.moveTo(px(i,ds.data.length),py(p.y)):ctx.lineTo(px(i,ds.data.length),py(p.y)));
-    ctx.stroke();ctx.globalAlpha=1;
+    ctx.stroke(); ctx.globalAlpha=1;
   });
 }
 
@@ -482,7 +535,7 @@ function renderDash(forcedThr) {
   if(!recent.length){
     list.innerHTML='<div style="font-size:13px;color:var(--text-secondary);padding:20px 0;text-align:center;">No sessions yet.</div>';
   } else {
-    list.innerHTML='<div class="session-grid session-header"><span>Date</span><span>Strain</span><span>Type</span><span>Source</span><span></span></div>'+
+    list.innerHTML='<div class="session-grid session-header"><span>Date</span><span>Strain</span><span>Duration</span><span>Type</span><span>Source</span><span></span></div>'+
     recent.map(s=>{
       const flagged=s.strain>thr;
       const d=new Date(s.date+'T12:00:00');
@@ -491,6 +544,7 @@ function renderDash(forcedThr) {
       return '<div class="session-grid session-row">'+
         '<span class="text-secondary">'+dateStr+'</span>'+
         '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+(flagged?' ⚑':'')+'</span>'+
+        '<span class="mono text-secondary">'+(s.duration?s.duration+'m':'—')+'</span>'+
         '<span style="font-size:12px;">'+typeLabel+'</span>'+
         '<span class="text-secondary" style="font-size:11px;text-transform:uppercase;">'+(s.source||'manual')+'</span>'+
         '<button onclick="deleteSession(\''+s.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);font-size:14px;padding:0;">✕</button>'+
