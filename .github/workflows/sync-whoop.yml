@@ -115,7 +115,7 @@ jobs:
             let pages = 0;
 
             do {
-              let url = 'https://api.prod.whoop.com/developer/v1/workout?limit=25';
+              let url = 'https://api.prod.whoop.com/developer/v2/activity/workout?limit=25';
               if (nextToken) url += '&nextToken=' + encodeURIComponent(nextToken);
 
               const resp = await get(url, accessToken);
