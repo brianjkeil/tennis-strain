@@ -823,10 +823,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-04-29T16:16:19.867Z",
+  "lastSync": "2026-04-30T15:57:26.012Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 91,
+    "added": 0,
+    "preserved": 92,
     "total": 92
   }
 }
