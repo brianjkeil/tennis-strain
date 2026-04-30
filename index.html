@@ -93,6 +93,17 @@
   .section-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
   .small-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
   .tag-saving { font-size: 11px; color: var(--text-secondary); padding: 2px 8px; }
+  .chart-tooltip {
+    position: absolute; pointer-events: none; opacity: 0;
+    background: var(--text); color: var(--bg);
+    padding: 7px 11px; border-radius: 7px;
+    font-size: 12px; line-height: 1.6;
+    white-space: nowrap;
+    transition: opacity 0.1s;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .chart-wrap { position: relative; }
   @media (max-width: 680px) {
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .charts-grid { grid-template-columns: 1fr; }
@@ -148,7 +159,7 @@
     <div class="charts-grid">
       <div class="card">
         <div class="label mb-8">Strain per session</div>
-        <canvas id="bar-chart" style="width:100%;height:130px;display:block;"></canvas>
+        <div class="chart-wrap"><canvas id="bar-chart" style="width:100%;display:block;"></canvas><div class="chart-tooltip" id="bar-tooltip"></div></div>
         <div class="legend">
           <div class="legend-item"><span class="legend-box" style="background:#378ADD;"></span> Normal</div>
           <div class="legend-item"><span class="legend-box" style="background:#E24B4A;"></span> Above threshold</div>
@@ -156,7 +167,7 @@
       </div>
       <div class="card">
         <div class="label mb-8">Rolling averages</div>
-        <canvas id="line-chart" style="width:100%;height:130px;display:block;"></canvas>
+        <div class="chart-wrap"><canvas id="line-chart" style="width:100%;display:block;"></canvas><div class="chart-tooltip" id="line-tooltip"></div></div>
         <div class="legend">
           <div class="legend-item"><span class="legend-line" style="background:#378ADD;opacity:0.4;"></span> Sessions</div>
           <div class="legend-item"><span class="legend-line" style="background:#EF9F27;"></span> 7-day avg</div>
@@ -468,8 +479,8 @@ function drawLine(id, datasets) {
 
   const PAD_L=36, PAD_R=8, PAD_T=16, PAD_B=24;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
-  const fixedMin=0, fixedMax=Math.ceil(Math.max(...allV,20)*1.05);
-  const ticks=[0,5,10,15,20].filter(v=>v<=fixedMax+1);
+  const fixedMin=0, fixedMax=20;
+  const ticks=[0,5,10,15,20];
 
   ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='right';
   ticks.forEach(v=>{
@@ -520,7 +531,7 @@ function renderDash(forcedThr) {
   document.getElementById('s-mtd-count').textContent=mtd.length+' this month';
   document.getElementById('s-flags').textContent=flags;
   document.getElementById('s-flags-sub').textContent='above '+thr;
-  const chartData=typed.map((s,i)=>({x:i,y:s.strain}));
+  const chartData=typed.map((s,i)=>({x:i,y:s.strain,date:s.date,type:s.type,id:s.id}));
   setTimeout(()=>{
     drawBar('bar-chart',chartData,thr);
     const r7=rolling(strains,7),r30=rolling(strains,30);
@@ -529,6 +540,8 @@ function renderDash(forcedThr) {
       {data:r7.map((v,i)=>({x:i,y:+v.toFixed(2)})),color:'#EF9F27',width:2},
       {data:r30.map((v,i)=>({x:i,y:+v.toFixed(2)})),color:'#7F77DD',width:2},
     ]);
+    setupBarTooltip('bar-chart','bar-tooltip',chartData,thr);
+    setupLineTooltip('line-chart','line-tooltip',chartData);
   },0);
   const list=document.getElementById('session-list');
   const recent=[...typed].reverse().slice(0,20);
@@ -675,6 +688,71 @@ function handleCSV(input){
 }
 
 window.addEventListener('resize',()=>renderDash());
+
+function formatTooltipDate(dateStr) {
+  const d = new Date(dateStr+'T12:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function setupBarTooltip(canvasId, tooltipId, data, threshold) {
+  const canvas = document.getElementById(canvasId);
+  const tooltip = document.getElementById(tooltipId);
+  if (!canvas || !tooltip) return;
+
+  const PAD_L=36, PAD_R=8, PAD_T=16, PAD_B=24;
+
+  canvas.onmousemove = function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const W = rect.width;
+    const cW = W - PAD_L - PAD_R;
+    const bw = Math.max(2, (cW / data.length) - 1.5);
+    const idx = Math.floor((x - PAD_L) / (bw + 1.5));
+    if (idx < 0 || idx >= data.length) { tooltip.style.opacity=0; return; }
+    const s = data[idx];
+    const typeLabel = s.type ? s.type.charAt(0).toUpperCase()+s.type.slice(1) : 'Untagged';
+    const flagged = threshold && s.y > threshold;
+    tooltip.innerHTML =
+      '<strong>'+formatTooltipDate(s.date)+'</strong><br>'+
+      'Strain: <strong style="color:'+(flagged?'#fc8181':'#63b3ed')+'">'+s.y.toFixed(1)+(flagged?' ⚑':'')+'</strong><br>'+
+      'Type: '+typeLabel;
+    const tx = e.clientX - rect.left + 12;
+    const ty = e.clientY - rect.top - 10;
+    tooltip.style.left = (tx + 120 > W ? tx - 140 : tx) + 'px';
+    tooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
+    tooltip.style.opacity = 1;
+  };
+  canvas.onmouseleave = function() { tooltip.style.opacity=0; };
+}
+
+function setupLineTooltip(canvasId, tooltipId, data) {
+  const canvas = document.getElementById(canvasId);
+  const tooltip = document.getElementById(tooltipId);
+  if (!canvas || !tooltip) return;
+
+  const PAD_L=36, PAD_R=8;
+
+  canvas.onmousemove = function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const W = rect.width;
+    const cW = W - PAD_L - PAD_R;
+    const idx = Math.round(((x - PAD_L) / cW) * (data.length - 1));
+    if (idx < 0 || idx >= data.length) { tooltip.style.opacity=0; return; }
+    const s = data[idx];
+    const typeLabel = s.type ? s.type.charAt(0).toUpperCase()+s.type.slice(1) : 'Untagged';
+    tooltip.innerHTML =
+      '<strong>'+formatTooltipDate(s.date)+'</strong><br>'+
+      'Strain: <strong style="color:#63b3ed">'+s.y.toFixed(1)+'</strong><br>'+
+      'Type: '+typeLabel;
+    const tx = e.clientX - rect.left + 12;
+    const ty = e.clientY - rect.top - 10;
+    tooltip.style.left = (tx + 120 > W ? tx - 140 : tx) + 'px';
+    tooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
+    tooltip.style.opacity = 1;
+  };
+  canvas.onmouseleave = function() { tooltip.style.opacity=0; };
+}
 
 function saveThreshold() {
   const val = document.getElementById('threshold-inp').value;
