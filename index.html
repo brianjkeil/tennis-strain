@@ -541,7 +541,7 @@ function renderDash(forcedThr) {
       {data:r30.map((v,i)=>({x:i,y:+v.toFixed(2)})),color:'#7F77DD',width:2},
     ]);
     setupBarTooltip('bar-chart','bar-tooltip',chartData,thr);
-    setupLineTooltip('line-chart','line-tooltip',chartData);
+    setupLineTooltip('line-chart','line-tooltip',chartData,r7,r30);
   },0);
   const list=document.getElementById('session-list');
   const recent=[...typed].reverse().slice(0,20);
@@ -716,16 +716,16 @@ function setupBarTooltip(canvasId, tooltipId, data, threshold) {
       '<strong>'+formatTooltipDate(s.date)+'</strong><br>'+
       'Strain: <strong style="color:'+(flagged?'#fc8181':'#63b3ed')+'">'+s.y.toFixed(1)+(flagged?' ⚑':'')+'</strong><br>'+
       'Type: '+typeLabel;
-    const tx = e.clientX - rect.left + 12;
-    const ty = e.clientY - rect.top - 10;
-    tooltip.style.left = (tx + 120 > W ? tx - 140 : tx) + 'px';
+    const tx = e.offsetX + 12;
+    const ty = e.offsetY - 50;
+    tooltip.style.left = (tx + 130 > W ? tx - 150 : tx) + 'px';
     tooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
     tooltip.style.opacity = 1;
   };
   canvas.onmouseleave = function() { tooltip.style.opacity=0; };
 }
 
-function setupLineTooltip(canvasId, tooltipId, data) {
+function setupLineTooltip(canvasId, tooltipId, data, r7, r30) {
   const canvas = document.getElementById(canvasId);
   const tooltip = document.getElementById(tooltipId);
   if (!canvas || !tooltip) return;
@@ -734,20 +734,21 @@ function setupLineTooltip(canvasId, tooltipId, data) {
 
   canvas.onmousemove = function(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = e.offsetX;
     const W = rect.width;
     const cW = W - PAD_L - PAD_R;
     const idx = Math.round(((x - PAD_L) / cW) * (data.length - 1));
     if (idx < 0 || idx >= data.length) { tooltip.style.opacity=0; return; }
     const s = data[idx];
-    const typeLabel = s.type ? s.type.charAt(0).toUpperCase()+s.type.slice(1) : 'Untagged';
+    const avg7 = r7[idx] ? r7[idx].toFixed(1) : '—';
+    const avg30 = r30[idx] ? r30[idx].toFixed(1) : '—';
     tooltip.innerHTML =
       '<strong>'+formatTooltipDate(s.date)+'</strong><br>'+
-      'Strain: <strong style="color:#63b3ed">'+s.y.toFixed(1)+'</strong><br>'+
-      'Type: '+typeLabel;
-    const tx = e.clientX - rect.left + 12;
-    const ty = e.clientY - rect.top - 10;
-    tooltip.style.left = (tx + 120 > W ? tx - 140 : tx) + 'px';
+      '7-day avg: <strong style="color:#EF9F27">'+avg7+'</strong><br>'+
+      '30-day avg: <strong style="color:#7F77DD">'+avg30+'</strong>';
+    const tx = e.offsetX + 12;
+    const ty = e.offsetY - 50;
+    tooltip.style.left = (tx + 130 > W ? tx - 150 : tx) + 'px';
     tooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
     tooltip.style.opacity = 1;
   };
