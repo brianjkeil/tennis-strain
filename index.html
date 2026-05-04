@@ -267,7 +267,6 @@ let activeType = 'all';
 let manualType = 'singles';
 let ghSettings = { pat: '', repo: '' };
 
-// ── Storage ──────────────────────────────────────────────────────────────────
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -308,12 +307,9 @@ function updateStatus(err) {
   el.textContent = sessions.length+' sessions · '+tagged+' tagged';
 }
 
-// ── Write tags to GitHub ─────────────────────────────────────────────────────
 async function writeTagToGitHub(id, type) {
-  if (!ghSettings.pat || !ghSettings.repo) return; // silently skip if not configured
-
+  if (!ghSettings.pat || !ghSettings.repo) return;
   try {
-    // Get current tags.json if it exists
     let currentTags = {};
     let sha = null;
     const getResp = await fetch(
@@ -325,58 +321,35 @@ async function writeTagToGitHub(id, type) {
       sha = data.sha;
       currentTags = JSON.parse(atob(data.content.replace(/\n/g,'')));
     }
-
-    // Add/update this tag
     currentTags[id] = type;
-
-    // Write back
-    const body = {
-      message: 'chore: update session tags',
-      content: btoa(JSON.stringify(currentTags, null, 2)),
-    };
+    const body = { message: 'chore: update session tags', content: btoa(JSON.stringify(currentTags, null, 2)) };
     if (sha) body.sha = sha;
-
     await fetch(
       `https://api.github.com/repos/${ghSettings.repo}/contents/tags.json`,
       {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${ghSettings.pat}`,
-          'Accept': 'application/vnd.github+json',
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${ghSettings.pat}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       }
     );
-  } catch(e) {
-    console.warn('Could not write tag to GitHub:', e);
-  }
+  } catch(e) { console.warn('Could not write tag to GitHub:', e); }
 }
 
-// ── Fetch data.json ──────────────────────────────────────────────────────────
 async function fetchDataJson() {
   try {
     const resp = await fetch('data.json?t='+Date.now());
     if (!resp.ok) return;
     const data = await resp.json();
     if (!data.sessions || !data.sessions.length) return;
-
-    // Build map of existing sessions keyed by id — preserve local tags
     const localMap = new Map(sessions.map(s=>[s.id,s]));
-
-    // Merge: for each session in data.json, use local tag if we have one
     const merged = data.sessions.map(s => {
       const local = localMap.get(s.id);
       return { ...s, type: (local && (local.type==='singles'||local.type==='doubles')) ? local.type : (s.type||null) };
     });
-
-    // Add any manual/csv sessions that aren't in data.json
     const remoteIds = new Set(data.sessions.map(s=>s.id));
     sessions.filter(s=>!remoteIds.has(s.id)).forEach(s=>merged.push(s));
-
     sessions = merged.sort((a,b)=>new Date(a.date)-new Date(b.date));
     save();
-
     if (data.lastSync) {
       const d = new Date(data.lastSync);
       const badge = document.getElementById('sync-badge');
@@ -388,7 +361,6 @@ async function fetchDataJson() {
   } catch(e) {}
 }
 
-// ── Tabs ─────────────────────────────────────────────────────────────────────
 function showTab(name, el) {
   ['dashboard','log','import','settings'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('hidden', t!==name);
@@ -416,7 +388,6 @@ function setManualType(t) {
   document.getElementById('m-pill-d').className = 'pill d'+(t==='doubles'?' active':'');
 }
 
-// ── Charts ───────────────────────────────────────────────────────────────────
 function rolling(arr, n) {
   return arr.map((_,i)=>{ const sl=arr.slice(Math.max(0,i-n+1),i+1); return sl.reduce((a,b)=>a+b,0)/sl.length; });
 }
@@ -428,12 +399,10 @@ function drawBar(id, data, threshold) {
   canvas.style.height=H+'px';
   const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
   if(!data.length){ctx.fillStyle='#888';ctx.font='12px sans-serif';ctx.fillText('No data yet',10,H/2);return;}
-
   const PAD_L=36, PAD_R=8, PAD_T=16, PAD_B=24;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const max=Math.ceil(Math.max(...data.map(d=>d.y),threshold||0)*1.1);
   const ticks=[0,5,10,15,20].filter(v=>v<=max+1);
-
   ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='right';
   ticks.forEach(v=>{
     const y=PAD_T+cH-(v/max)*cH;
@@ -441,15 +410,12 @@ function drawBar(id, data, threshold) {
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.fillStyle='#9ca3af'; ctx.fillText(v,PAD_L-4,y+3.5);
   });
-
   ctx.save();
   ctx.translate(11,PAD_T+cH/2); ctx.rotate(-Math.PI/2);
   ctx.textAlign='center'; ctx.fillStyle='#9ca3af'; ctx.font='10px -apple-system,sans-serif';
   ctx.fillText('Strain',0,0); ctx.restore();
-
   ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5;
   ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T); ctx.lineTo(PAD_L,PAD_T+cH); ctx.stroke();
-
   const bw=Math.max(2,(cW/data.length)-1.5);
   data.forEach((d,i)=>{
     const bh=Math.max(2,(d.y/max)*cH);
@@ -460,7 +426,6 @@ function drawBar(id, data, threshold) {
     ctx.fill();
   });
   ctx.globalAlpha=1;
-
   if(threshold){
     const ty=PAD_T+cH-(threshold/max)*cH;
     ctx.strokeStyle='#E24B4A'; ctx.lineWidth=1; ctx.setLineDash([5,4]);
@@ -476,12 +441,10 @@ function drawLine(id, datasets) {
   const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
   const allV=datasets.flatMap(d=>d.data.map(p=>p.y)).filter(Boolean);
   if(!allV.length) return;
-
   const PAD_L=36, PAD_R=8, PAD_T=16, PAD_B=24;
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const fixedMin=0, fixedMax=20;
   const ticks=[0,5,10,15,20];
-
   ctx.font='10px -apple-system,sans-serif'; ctx.textAlign='right';
   ticks.forEach(v=>{
     const y=PAD_T+cH-((v-fixedMin)/(fixedMax-fixedMin))*cH;
@@ -490,18 +453,14 @@ function drawLine(id, datasets) {
     ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
     ctx.fillStyle='#9ca3af'; ctx.fillText(v,PAD_L-4,y+3.5);
   });
-
   ctx.save();
   ctx.translate(11,PAD_T+cH/2); ctx.rotate(-Math.PI/2);
   ctx.textAlign='center'; ctx.fillStyle='#9ca3af'; ctx.font='10px -apple-system,sans-serif';
   ctx.fillText('Strain',0,0); ctx.restore();
-
   ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5;
   ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T); ctx.lineTo(PAD_L,PAD_T+cH); ctx.stroke();
-
   const px=(i,len)=>PAD_L+(len<=1?cW/2:(i/(len-1))*cW);
   const py=v=>PAD_T+cH-((v-fixedMin)/(fixedMax-fixedMin))*cH;
-
   datasets.forEach(ds=>{
     if(!ds.data.length) return;
     ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=ds.width||1.5; ctx.globalAlpha=ds.alpha||1;
@@ -511,7 +470,6 @@ function drawLine(id, datasets) {
   });
 }
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
 function renderDash(forcedThr) {
   const thr=forcedThr||parseFloat(document.getElementById('threshold-inp').value)||15;
   const typed=sessions
@@ -556,7 +514,7 @@ function renderDash(forcedThr) {
       const typeLabel=s.type?s.type.charAt(0).toUpperCase()+s.type.slice(1):'<span style="color:var(--amber)">Untagged</span>';
       return '<div class="session-grid session-row">'+
         '<span class="text-secondary">'+dateStr+'</span>'+
-        '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+':'')+'</span>'+
+        '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+'</span>'+
         '<span class="mono text-secondary">'+(s.duration?s.duration+'m':'—')+'</span>'+
         '<span style="font-size:12px;">'+typeLabel+'</span>'+
         '<span class="text-secondary" style="font-size:11px;text-transform:uppercase;">'+(s.source||'manual')+'</span>'+
@@ -574,7 +532,6 @@ function renderDash(forcedThr) {
 
 function deleteSession(id){sessions=sessions.filter(s=>s.id!==id);save();renderDash();}
 
-// ── Tag queue ────────────────────────────────────────────────────────────────
 function renderTagQueue() {
   const queue=sessions.filter(s=>s.type!=='singles'&&s.type!=='doubles');
   const el=document.getElementById('tag-queue');
@@ -604,21 +561,14 @@ function renderTagQueue() {
 
 function tagSession(id, type) {
   sessions=sessions.map(s=>s.id===id?{...s,type}:s);
-  save();
-  renderTagQueue();
-  updateStatus();
-  renderDash();
-  // Write to GitHub asynchronously
+  save(); renderTagQueue(); updateStatus(); renderDash();
   const savingEl = document.getElementById('saving-'+id);
   if(savingEl) savingEl.classList.remove('hidden');
-  writeTagToGitHub(id, type).finally(()=>{
-    if(savingEl) savingEl.classList.add('hidden');
-  });
+  writeTagToGitHub(id, type).finally(()=>{ if(savingEl) savingEl.classList.add('hidden'); });
 }
 
 function skipSession(id){sessions=sessions.filter(s=>s.id!==id);save();renderTagQueue();}
 
-// ── Manual entry ─────────────────────────────────────────────────────────────
 function addManual(){
   const date=document.getElementById('m-date').value;
   const strainRaw=document.getElementById('m-strain').value;
@@ -627,7 +577,7 @@ function addManual(){
   if(!date||!strainRaw){msg.style.color='var(--red)';msg.textContent='Date and strain required.';return;}
   if(new Date(date+'T12:00:00').getFullYear()<2026){msg.style.color='var(--red)';msg.textContent='Only 2026+ sessions.';return;}
   const strain=parseFloat(strainRaw);
-  if(isNaN(strain)||strain<0||strain>21){msg.style.color='var(--red)';msg.textContent='Strain must be 0–21.';return;}
+  if(isNaN(strain)||strain<0||strain>21){msg.style.color='var(--red)';msg.textContent='Strain must be 0-21.';return;}
   const id='manual-'+Date.now();
   sessions.push({id,date,strain,recovery:recovRaw?parseFloat(recovRaw):null,type:manualType,source:'manual'});
   save();
@@ -638,7 +588,6 @@ function addManual(){
   renderDash();
 }
 
-// ── CSV import ───────────────────────────────────────────────────────────────
 function is2026OrLater(dateStr){return new Date(dateStr+'T12:00:00').getFullYear()>=2026;}
 
 function parseWhoopCSV(text){
@@ -698,23 +647,20 @@ function setupBarTooltip(canvasId, tooltipId, data, threshold) {
   const canvas = document.getElementById(canvasId);
   const tooltip = document.getElementById(tooltipId);
   if (!canvas || !tooltip) return;
-
-  const PAD_L=36, PAD_R=8, PAD_T=16, PAD_B=24;
-
+  const PAD_L=36, PAD_R=8;
   canvas.onmousemove = function(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
     const W = rect.width;
     const cW = W - PAD_L - PAD_R;
     const bw = Math.max(2, (cW / data.length) - 1.5);
-    const idx = Math.floor((x - PAD_L) / (bw + 1.5));
+    const idx = Math.floor((e.offsetX - PAD_L) / (bw + 1.5));
     if (idx < 0 || idx >= data.length) { tooltip.style.opacity=0; return; }
     const s = data[idx];
     const typeLabel = s.type ? s.type.charAt(0).toUpperCase()+s.type.slice(1) : 'Untagged';
     const flagged = threshold && s.y > threshold;
     tooltip.innerHTML =
       '<strong>'+formatTooltipDate(s.date)+'</strong><br>'+
-      'Strain: <strong style="color:'+(flagged?'#fc8181':'#63b3ed')+'">'+s.y.toFixed(1)+(flagged?' ⚑':'')+'</strong><br>'+
+      'Strain: <strong style="color:'+(flagged?'#fc8181':'#63b3ed')+'">'+s.y.toFixed(1)+'</strong>'+(flagged?' <span style="font-size:10px;color:#fc8181;">above threshold</span>':'')+'<br>'+
       'Type: '+typeLabel;
     const tx = e.offsetX + 12;
     const ty = e.offsetY - 50;
@@ -729,15 +675,12 @@ function setupLineTooltip(canvasId, tooltipId, data, r7, r30) {
   const canvas = document.getElementById(canvasId);
   const tooltip = document.getElementById(tooltipId);
   if (!canvas || !tooltip) return;
-
   const PAD_L=36, PAD_R=8;
-
   canvas.onmousemove = function(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.offsetX;
     const W = rect.width;
     const cW = W - PAD_L - PAD_R;
-    const idx = Math.round(((x - PAD_L) / cW) * (data.length - 1));
+    const idx = Math.round(((e.offsetX - PAD_L) / cW) * (data.length - 1));
     if (idx < 0 || idx >= data.length) { tooltip.style.opacity=0; return; }
     const s = data[idx];
     const avg7 = r7[idx] ? r7[idx].toFixed(1) : '—';
