@@ -556,7 +556,7 @@ function renderDash(forcedThr) {
       const typeLabel=s.type?s.type.charAt(0).toUpperCase()+s.type.slice(1):'<span style="color:var(--amber)">Untagged</span>';
       return '<div class="session-grid session-row">'+
         '<span class="text-secondary">'+dateStr+'</span>'+
-        '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+(flagged?' ⚑':'')+'</span>'+
+        '<span class="mono" style="font-weight:600;color:'+(flagged?'var(--red)':'var(--blue)')+';">'+s.strain.toFixed(1)+':'')+'</span>'+
         '<span class="mono text-secondary">'+(s.duration?s.duration+'m':'—')+'</span>'+
         '<span style="font-size:12px;">'+typeLabel+'</span>'+
         '<span class="text-secondary" style="font-size:11px;text-transform:uppercase;">'+(s.source||'manual')+'</span>'+
