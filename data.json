@@ -857,12 +857,21 @@
       "duration": 82,
       "recovery": null,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-0b5ae658-22b6-411b-b3bf-43fa1a145571",
+      "date": "2026-05-04",
+      "strain": 13.9,
+      "type": null,
+      "duration": 91,
+      "recovery": null,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-04T16:20:55.989Z",
+  "lastSync": "2026-05-05T17:46:48.688Z",
   "syncStats": {
     "added": 1,
-    "preserved": 95,
-    "total": 96
+    "preserved": 96,
+    "total": 97
   }
 }
