@@ -886,10 +886,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-08T15:10:02.551Z",
+  "lastSync": "2026-05-08T19:51:25.208Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 98,
+    "added": 0,
+    "preserved": 99,
     "total": 99
   }
 }
