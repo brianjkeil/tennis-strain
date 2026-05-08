@@ -1,3 +1,1 @@
-{
-  "test-session-123": "singles"
-}
+var d=JSON.parse(localStorage.getItem('bk-tennis-strain-PERMANENT'));var t={};d.filter(s=>s.type==='singles'||s.type==='doubles').forEach(s=>t[s.id]=s.type);copy(JSON.stringify(t,null,2))
