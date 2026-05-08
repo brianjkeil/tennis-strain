@@ -135,7 +135,6 @@
       <button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
       <button class="tab" onclick="showTab('log',this)">Tag Sessions</button>
       <button class="tab" onclick="showTab('import',this)">Import CSV</button>
-      <button class="tab" onclick="showTab('settings',this)">Settings</button>
     </div>
   </div>
 
@@ -230,71 +229,25 @@
     </div>
   </div>
 
-  <!-- SETTINGS -->
-  <div id="tab-settings" class="hidden" style="max-width:540px;">
-    <div class="card mb-16">
-      <div class="section-title">GitHub settings</div>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">
-        Required for tags to persist permanently across devices. Your PAT is stored only in this browser.
-      </p>
-      <div class="col-form">
-        <div>
-          <span class="label">GitHub Personal Access Token (PAT)</span>
-          <input type="password" id="setting-pat" placeholder="ghp_xxxxxxxxxxxx">
-        </div>
-        <div>
-          <span class="label">Repository (owner/repo)</span>
-          <input type="text" id="setting-repo" placeholder="brianjkeil/tennis-strain">
-        </div>
-        <button class="btn primary" onclick="saveSettings()">Save settings</button>
-        <div id="settings-msg" style="font-size:12px;min-height:16px;"></div>
-      </div>
-    </div>
-    <div class="card" style="background:var(--amber-bg);border-color:var(--amber-border);">
-      <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:4px;">How tag persistence works</div>
-      <div style="font-size:12px;color:var(--amber);line-height:1.6;">
-        When you tag a session, it saves immediately to this browser and also writes to <code>tags.json</code> in your GitHub repo. The daily workflow picks up those tags and merges them permanently into <code>data.json</code>. Tags then survive browser clears and work on any device.
-      </div>
-    </div>
-  </div>
+
 </div>
 
 <script>
 const STORAGE_KEY = 'bk-tennis-strain-PERMANENT';
-const SETTINGS_KEY = 'bk-tennis-settings';
 let sessions = [];
 let activeType = 'all';
 let manualType = 'singles';
-let ghSettings = { pat: '', repo: '' };
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) sessions = JSON.parse(raw);
-    const s = localStorage.getItem(SETTINGS_KEY);
-    if (s) ghSettings = JSON.parse(s);
   } catch(e) { sessions = []; }
 }
 
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); updateStatus(); }
   catch(e) { updateStatus(true); }
-}
-
-function saveSettings() {
-  const pat = document.getElementById('setting-pat').value.trim();
-  const repo = document.getElementById('setting-repo').value.trim();
-  const msg = document.getElementById('settings-msg');
-  if (!pat || !repo) { msg.style.color='var(--red)'; msg.textContent='Both fields required.'; return; }
-  ghSettings = { pat, repo };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(ghSettings));
-  msg.style.color='var(--green)'; msg.textContent='Settings saved.';
-  setTimeout(()=>msg.textContent='',2500);
-}
-
-function loadSettingsUI() {
-  if (ghSettings.pat) document.getElementById('setting-pat').value = ghSettings.pat;
-  if (ghSettings.repo) document.getElementById('setting-repo').value = ghSettings.repo;
 }
 
 function updateStatus(err) {
@@ -308,13 +261,14 @@ function updateStatus(err) {
 }
 
 async function writeTagToGitHub(id, type) {
-  if (!ghSettings.pat || !ghSettings.repo) return;
+  const PAT = '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';
+  const REPO = 'brianjkeil/tennis-strain';
   try {
     let currentTags = {};
     let sha = null;
     const getResp = await fetch(
-      `https://api.github.com/repos/${ghSettings.repo}/contents/tags.json`,
-      { headers: { 'Authorization': `Bearer ${ghSettings.pat}`, 'Accept': 'application/vnd.github+json' } }
+      `https://api.github.com/repos/${REPO}/contents/tags.json`,
+      { headers: { 'Authorization': `Bearer ${PAT}`, 'Accept': 'application/vnd.github+json' } }
     );
     if (getResp.ok) {
       const data = await getResp.json();
@@ -324,14 +278,18 @@ async function writeTagToGitHub(id, type) {
     currentTags[id] = type;
     const body = { message: 'chore: update session tags', content: btoa(JSON.stringify(currentTags, null, 2)) };
     if (sha) body.sha = sha;
-    await fetch(
-      `https://api.github.com/repos/${ghSettings.repo}/contents/tags.json`,
+    const putResp = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/tags.json`,
       {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${ghSettings.pat}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${PAT}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       }
     );
+    if (!putResp.ok) {
+      const err = await putResp.json();
+      console.warn('Tag write failed:', err);
+    }
   } catch(e) { console.warn('Could not write tag to GitHub:', e); }
 }
 
@@ -362,14 +320,13 @@ async function fetchDataJson() {
 }
 
 function showTab(name, el) {
-  ['dashboard','log','import','settings'].forEach(t=>{
+  ['dashboard','log','import'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('hidden', t!==name);
   });
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   if (el) el.classList.add('active');
   if (name==='dashboard') renderDash();
   if (name==='log') renderTagQueue();
-  if (name==='settings') loadSettingsUI();
 }
 
 function setType(t) {
