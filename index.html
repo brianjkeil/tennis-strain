@@ -104,6 +104,44 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
   .chart-wrap { position: relative; }
+  /* Analytics tab */
+  .an-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .an-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+  .an-card.full { grid-column: 1 / -1; }
+  .an-eyebrow { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+  .an-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .comp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .comp-side { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px 14px; }
+  .comp-type { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .comp-type.s { color: var(--blue); }
+  .comp-type.d { color: var(--green); }
+  .comp-stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .comp-stat:last-child { border-bottom: none; }
+  .comp-stat-val { font-family: var(--font-mono); font-weight: 500; }
+  .zone-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+  .zone-box { border-radius: var(--radius-md); padding: 10px 12px; }
+  .zone-box.g { background: #dcfce7; }
+  .zone-box.y { background: #fef9c3; }
+  .zone-box.r { background: #fee2e2; }
+  .zone-title { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+  .zone-box.g .zone-title { color: #15803d; }
+  .zone-box.y .zone-title { color: #92400e; }
+  .zone-box.r .zone-title { color: #b91c1c; }
+  .zone-stat { font-size: 11px; color: var(--text-secondary); }
+  .streak-grid { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 8px; }
+  .streak-sq { width: 20px; height: 20px; border-radius: 3px; cursor: pointer; }
+  .streak-sq.s { background: #bfdbfe; }
+  .streak-sq.d { background: #bbf7d0; }
+  .streak-sq.r { background: var(--bg-secondary); }
+  .streak-sq.today { outline: 2px solid var(--text); outline-offset: 1px; }
+  .an-stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 12px; }
+  .an-stat { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 10px 12px; }
+  .an-stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .an-stat-val { font-size: 22px; font-weight: 600; font-family: var(--font-mono); line-height: 1; }
+  .an-stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .diff-note { font-size: 12px; color: var(--text-secondary); padding: 8px 12px; background: var(--bg-secondary); border-radius: var(--radius-md); margin-top: 10px; line-height: 1.5; }
+  @media (max-width: 680px) { .an-grid { grid-template-columns: 1fr; } .an-stat-row { grid-template-columns: repeat(2,1fr); } }
+  /* Analytics tab */
   @media (max-width: 680px) {
     .stats-grid { grid-template-columns: repeat(2,1fr); }
     .charts-grid { grid-template-columns: 1fr; }
@@ -133,6 +171,7 @@
     </div>
     <div class="tab-bar">
       <button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
+      <button class="tab" onclick="showTab('analytics',this)">Analytics</button>
       <button class="tab" onclick="showTab('log',this)">Tag Sessions</button>
       <button class="tab" onclick="showTab('import',this)">Import CSV</button>
     </div>
@@ -230,6 +269,13 @@
   </div>
 
 
+  <!-- ANALYTICS -->
+  <div id="tab-analytics" class="hidden">
+    <div class="an-grid" id="analytics-content">
+      <div class="an-card full" style="text-align:center;color:var(--text-secondary);padding:40px;">Loading analytics...</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -320,13 +366,14 @@ async function fetchDataJson() {
 }
 
 function showTab(name, el) {
-  ['dashboard','log','import'].forEach(t=>{
+  ['dashboard','log','import','analytics'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('hidden', t!==name);
   });
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   if (el) el.classList.add('active');
   if (name==='dashboard') renderDash();
   if (name==='log') renderTagQueue();
+  if (name==='analytics') renderAnalytics();
 }
 
 function setType(t) {
@@ -669,6 +716,331 @@ function loadThreshold() {
   const el = document.getElementById('threshold-inp');
   el.value = val;
   return parseFloat(val) || 15;
+}
+
+function renderAnalytics() {
+  const container = document.getElementById('analytics-content');
+  if (!container) return;
+
+  const singles = sessions.filter(s => s.type === 'singles').sort((a,b) => new Date(a.date)-new Date(b.date));
+  const doubles = sessions.filter(s => s.type === 'doubles').sort((a,b) => new Date(a.date)-new Date(b.date));
+  const all = sessions.filter(s => s.type === 'singles' || s.type === 'doubles').sort((a,b) => new Date(a.date)-new Date(b.date));
+
+  const avg = arr => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+  const max = arr => arr.length ? Math.max(...arr) : 0;
+
+  // Singles stats
+  const sStrains = singles.map(s=>s.strain);
+  const dStrains = doubles.map(s=>s.strain);
+  const sDur = singles.filter(s=>s.duration).map(s=>s.duration);
+  const dDur = doubles.filter(s=>s.duration).map(s=>s.duration);
+
+  // Monthly data
+  const months = {};
+  all.forEach(s => {
+    const d = new Date(s.date+'T12:00:00');
+    const key = d.getFullYear()+'-'+(d.getMonth()+1);
+    const label = d.toLocaleDateString('en-US',{month:'short',year:'2-digit'});
+    if (!months[key]) months[key] = {label, singles:[], doubles:[], all:[]};
+    months[key].all.push(s.strain);
+    if (s.type==='singles') months[key].singles.push(s.strain);
+    else months[key].doubles.push(s.strain);
+  });
+
+  const monthKeys = Object.keys(months).sort();
+  const maxMonthAvg = Math.max(...monthKeys.map(k => avg(months[k].all))) * 1.15;
+
+  // Streak calculation
+  const dateSet = new Set(all.map(s=>s.date));
+  const typeMap = {};
+  all.forEach(s => typeMap[s.date] = s.type);
+
+  const today = new Date();
+  let currentStreak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    if (dateSet.has(ds)) currentStreak++;
+    else break;
+  }
+
+  let longestStreak = 0, cur = 0;
+  const sortedDates = [...dateSet].sort();
+  sortedDates.forEach((d, i) => {
+    if (i === 0) { cur = 1; return; }
+    const prev = new Date(sortedDates[i-1]+'T12:00:00');
+    const curr = new Date(d+'T12:00:00');
+    const diff = (curr - prev) / 86400000;
+    if (diff === 1) { cur++; longestStreak = Math.max(longestStreak, cur); }
+    else cur = 1;
+  });
+  longestStreak = Math.max(longestStreak, cur);
+
+  // Weekly frequency
+  const totalDays = all.length > 0 ? Math.ceil((new Date(all[all.length-1].date+'T12:00:00') - new Date(all[0].date+'T12:00:00')) / 86400000) + 1 : 1;
+  const totalWeeks = Math.max(1, totalDays / 7);
+  const avgPerWeek = (all.length / totalWeeks).toFixed(1);
+  const restPct = Math.round((1 - all.length / totalDays) * 100);
+
+  // Best week
+  const weekMap = {};
+  all.forEach(s => {
+    const d = new Date(s.date+'T12:00:00');
+    const weekStart = new Date(d);
+    weekStart.setDate(d.getDate() - d.getDay());
+    const wk = weekStart.toISOString().split('T')[0];
+    weekMap[wk] = (weekMap[wk]||0) + 1;
+  });
+  const bestWeek = Math.max(...Object.values(weekMap), 0);
+
+  // Streak calendar — last 90 days
+  const calDays = [];
+  for (let i = 89; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    calDays.push({ date: ds, type: typeMap[ds] || null, isToday: i === 0 });
+  }
+
+  // Month bars HTML
+  let momHtml = '<div style="display:flex;gap:12px;align-items:flex-end;height:100px;margin-bottom:8px;">';
+  monthKeys.forEach(k => {
+    const m = months[k];
+    const h = Math.round((avg(m.all) / maxMonthAvg) * 100);
+    const sh = m.singles.length ? Math.round((avg(m.singles) / maxMonthAvg) * 100) : 0;
+    const dh = m.doubles.length ? Math.round((avg(m.doubles) / maxMonthAvg) * 100) : 0;
+    momHtml += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
+      <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);">${avg(m.all).toFixed(1)}</div>
+      <div style="display:flex;gap:2px;align-items:flex-end;width:100%;height:80px;">
+        <div style="flex:1;background:var(--blue-light);border-radius:2px 2px 0 0;height:${sh}%;"></div>
+        <div style="flex:1;background:var(--green-light);border-radius:2px 2px 0 0;height:${dh}%;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text-secondary);">${m.label}</div>
+      <div style="font-size:10px;color:var(--text-secondary);">${m.all.length}s</div>
+    </div>`;
+  });
+  momHtml += '</div>';
+
+  // Streak squares HTML
+  let streakHtml = '';
+  calDays.forEach(d => {
+    const cls = d.type === 'singles' ? 's' : d.type === 'doubles' ? 'd' : 'r';
+    streakHtml += `<div class="streak-sq ${cls}${d.isToday?' today':''}" title="${d.date}${d.type?' · '+d.type:'· rest'}"></div>`;
+  });
+
+  // Recovery scatter data
+  const withRecovery = all.filter(s => s.recovery !== null && s.recovery !== undefined);
+  let recoveryHtml = '';
+  if (withRecovery.length < 3) {
+    recoveryHtml = '<div style="font-size:13px;color:var(--text-secondary);padding:20px 0;text-align:center;">Recovery data will appear here after the next workflow sync. The workflow now fetches recovery scores daily from WHOOP.</div>';
+  } else {
+    // Build scatter plot as canvas
+    recoveryHtml = '<div style="position:relative;"><canvas id="recovery-chart" style="width:100%;height:220px;display:block;"></canvas></div>';
+    recoveryHtml += '<div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--text-secondary);">';
+    recoveryHtml += '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block;"></span>Singles</span>';
+    recoveryHtml += '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;"></span>Doubles</span>';
+    recoveryHtml += '<span style="margin-left:auto;">X axis: Recovery % · Y axis: Strain</span></div>';
+
+    // Zone breakdown
+    const greenSessions = withRecovery.filter(s => s.recovery >= 67);
+    const yellowSessions = withRecovery.filter(s => s.recovery >= 34 && s.recovery < 67);
+    const redSessions = withRecovery.filter(s => s.recovery < 34);
+    const zoneAvg = arr => arr.length ? (arr.reduce((a,s)=>a+s.strain,0)/arr.length).toFixed(1) : '—';
+
+    recoveryHtml += '<div class="zone-row" style="margin-top:12px;">';
+    recoveryHtml += `<div class="zone-box g"><div class="zone-title">Green (67–100%)</div><div class="zone-stat">Avg strain: <strong>${zoneAvg(greenSessions)}</strong> · ${greenSessions.length} sessions</div></div>`;
+    recoveryHtml += `<div class="zone-box y"><div class="zone-title">Yellow (34–66%)</div><div class="zone-stat">Avg strain: <strong>${zoneAvg(yellowSessions)}</strong> · ${yellowSessions.length} sessions</div></div>`;
+    recoveryHtml += `<div class="zone-box r"><div class="zone-title">Red (0–33%)</div><div class="zone-stat">Avg strain: <strong>${zoneAvg(redSessions)}</strong> · ${redSessions.length} sessions</div></div>`;
+    recoveryHtml += '</div>';
+
+    // Insight
+    if (redSessions.length > 0 && greenSessions.length > 0) {
+      const redAvg = parseFloat(zoneAvg(redSessions));
+      const greenAvg = parseFloat(zoneAvg(greenSessions));
+      if (redAvg > greenAvg) {
+        recoveryHtml += `<div class="diff-note" style="margin-top:10px;background:rgba(220,38,38,0.06);color:#991b1b;">You average <strong>+${(redAvg-greenAvg).toFixed(1)}</strong> higher strain on red-zone days than green — worth monitoring as training load increases.</div>`;
+      } else {
+        recoveryHtml += `<div class="diff-note" style="margin-top:10px;">You average <strong>${(greenAvg-redAvg).toFixed(1)}</strong> higher strain on green-zone days — good alignment between readiness and training load.</div>`;
+      }
+    }
+  }
+
+  container.innerHTML = `
+    <!-- Row 1: Monthly + Comparison -->
+    <div class="an-card">
+      <div class="an-eyebrow">Load progression</div>
+      <div class="an-title">Monthly Strain Average</div>
+      ${momHtml}
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-secondary);">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue-light);display:inline-block;"></span>Singles</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--green-light);display:inline-block;"></span>Doubles</span>
+      </div>
+    </div>
+
+    <div class="an-card">
+      <div class="an-eyebrow">Format comparison</div>
+      <div class="an-title">Singles vs Doubles</div>
+      <div class="comp-row">
+        <div class="comp-side">
+          <div class="comp-type s">Singles</div>
+          <div class="comp-stat"><span>Avg strain</span><span class="comp-stat-val" style="color:var(--blue);">${avg(sStrains).toFixed(1)}</span></div>
+          <div class="comp-stat"><span>Peak</span><span class="comp-stat-val">${max(sStrains).toFixed(1)}</span></div>
+          <div class="comp-stat"><span>Sessions</span><span class="comp-stat-val">${singles.length}</span></div>
+          <div class="comp-stat"><span>Avg duration</span><span class="comp-stat-val">${sDur.length?Math.round(avg(sDur))+'m':'—'}</span></div>
+        </div>
+        <div class="comp-side">
+          <div class="comp-type d">Doubles</div>
+          <div class="comp-stat"><span>Avg strain</span><span class="comp-stat-val" style="color:var(--green);">${avg(dStrains).toFixed(1)}</span></div>
+          <div class="comp-stat"><span>Peak</span><span class="comp-stat-val">${max(dStrains).toFixed(1)}</span></div>
+          <div class="comp-stat"><span>Sessions</span><span class="comp-stat-val">${doubles.length}</span></div>
+          <div class="comp-stat"><span>Avg duration</span><span class="comp-stat-val">${dDur.length?Math.round(avg(dDur))+'m':'—'}</span></div>
+        </div>
+      </div>
+      <div class="diff-note">
+        Singles avg <strong style="color:var(--blue);">${avg(sStrains).toFixed(1)}</strong> vs Doubles avg <strong style="color:var(--green);">${avg(dStrains).toFixed(1)}</strong> — 
+        ${avg(sStrains) > avg(dStrains) 
+          ? 'Singles push <strong>+' + (avg(sStrains)-avg(dStrains)).toFixed(1) + '</strong> harder on strain'
+          : 'Doubles push <strong>+' + (avg(dStrains)-avg(sStrains)).toFixed(1) + '</strong> harder on strain'}.
+        Doubles run <strong>+${dDur.length&&sDur.length?Math.abs(Math.round(avg(dDur))-Math.round(avg(sDur)))+'m':' — '}m</strong> longer on average.
+      </div>
+    </div>
+
+    <!-- Row 2: Frequency + Streak -->
+    <div class="an-card">
+      <div class="an-eyebrow">Training volume</div>
+      <div class="an-title">Session Frequency</div>
+      <div class="an-stat-row">
+        <div class="an-stat"><div class="an-stat-label">Avg / week</div><div class="an-stat-val text-blue">${avgPerWeek}</div><div class="an-stat-sub">sessions</div></div>
+        <div class="an-stat"><div class="an-stat-label">Best week</div><div class="an-stat-val">${bestWeek}</div><div class="an-stat-sub">sessions</div></div>
+        <div class="an-stat"><div class="an-stat-label">Total</div><div class="an-stat-val">${all.length}</div><div class="an-stat-sub">sessions</div></div>
+        <div class="an-stat"><div class="an-stat-label">Rest days</div><div class="an-stat-val">${restPct}%</div><div class="an-stat-sub">of days</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Last 90 days — each bar = one week</div>
+      <canvas id="freq-chart" style="width:100%;height:80px;display:block;"></canvas>
+    </div>
+
+    <div class="an-card">
+      <div class="an-eyebrow">Consistency</div>
+      <div class="an-title">Streak & Rest Tracking</div>
+      <div class="an-stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+        <div class="an-stat"><div class="an-stat-label">Current streak</div><div class="an-stat-val" style="color:#ea580c;">${currentStreak}</div><div class="an-stat-sub">days</div></div>
+        <div class="an-stat"><div class="an-stat-label">Longest streak</div><div class="an-stat-val text-blue">${longestStreak}</div><div class="an-stat-sub">days</div></div>
+        <div class="an-stat"><div class="an-stat-label">Rest days</div><div class="an-stat-val text-green">${restPct}%</div><div class="an-stat-sub">of days</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;">Last 90 days</div>
+      <div class="streak-grid">${streakHtml}</div>
+      <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--text-secondary);">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#bfdbfe;display:inline-block;"></span>Singles</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#bbf7d0;display:inline-block;"></span>Doubles</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--bg-secondary);display:inline-block;"></span>Rest</span>
+      </div>
+    </div>
+
+    <!-- Row 3: Strain vs Recovery -->
+    <div class="an-card full">
+      <div class="an-eyebrow">Recovery context</div>
+      <div class="an-title">Strain vs Recovery Score</div>
+      ${recoveryHtml}
+    </div>
+  `;
+
+  // Draw frequency chart
+  setTimeout(() => {
+    const canvas = document.getElementById('freq-chart');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio||1;
+    const W = canvas.offsetWidth||400, H = 80;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0,0,W,H);
+
+    // Build weekly counts for last 90 days
+    const weeks = [];
+    for (let w = 0; w < 13; w++) {
+      let count = 0;
+      for (let d = 0; d < 7; d++) {
+        const offset = (12-w)*7 + (6-d);
+        const date = new Date(today);
+        date.setDate(date.getDate() - offset);
+        const ds = date.toISOString().split('T')[0];
+        if (dateSet.has(ds)) count++;
+      }
+      weeks.push(count);
+    }
+    const maxW = Math.max(...weeks, 1);
+    const bw = (W / weeks.length) - 3;
+    weeks.forEach((c, i) => {
+      const bh = Math.max(2, (c/maxW)*(H-16));
+      const x = i*(bw+3);
+      const y = H-bh-4;
+      ctx.fillStyle = c >= 5 ? '#185FA5' : c >= 3 ? '#60a5fa' : '#bfdbfe';
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,2); else ctx.rect(x,y,bw,bh);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(c, x+bw/2, H-1);
+    });
+  // Draw recovery scatter if data available
+  const withRec = all.filter(s => s.recovery !== null && s.recovery !== undefined);
+  if (withRec.length >= 3) {
+    const recCanvas = document.getElementById('recovery-chart');
+    if (recCanvas) {
+      const dpr2 = window.devicePixelRatio||1;
+      const W2 = recCanvas.offsetWidth||400, H2 = 220;
+      recCanvas.width = W2*dpr2; recCanvas.height = H2*dpr2;
+      const ctx2 = recCanvas.getContext('2d');
+      ctx2.scale(dpr2, dpr2);
+      ctx2.clearRect(0,0,W2,H2);
+
+      const PAD_L=36, PAD_R=12, PAD_T=12, PAD_B=24;
+      const cW2=W2-PAD_L-PAD_R, cH2=H2-PAD_T-PAD_B;
+
+      // Grid lines
+      [0,25,50,75,100].forEach(v => {
+        const x = PAD_L + (v/100)*cW2;
+        ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5; ctx2.setLineDash([]);
+        ctx2.beginPath(); ctx2.moveTo(x,PAD_T); ctx2.lineTo(x,PAD_T+cH2); ctx2.stroke();
+        ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='center';
+        ctx2.fillText(v+'%', x, H2-6);
+      });
+      [0,5,10,15,20].forEach(v => {
+        const y = PAD_T+cH2-(v/20)*cH2;
+        ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5;
+        ctx2.beginPath(); ctx2.moveTo(PAD_L,y); ctx2.lineTo(W2-PAD_R,y); ctx2.stroke();
+        ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='right';
+        ctx2.fillText(v, PAD_L-3, y+3);
+      });
+
+      // Axes
+      ctx2.strokeStyle='rgba(0,0,0,0.12)'; ctx2.lineWidth=0.5;
+      ctx2.beginPath(); ctx2.moveTo(PAD_L,PAD_T); ctx2.lineTo(PAD_L,PAD_T+cH2); ctx2.lineTo(W2-PAD_R,PAD_T+cH2); ctx2.stroke();
+
+      // Quadrant dividers
+      const midX = PAD_L + 0.5*cW2;
+      const midY = PAD_T + cH2 - (13/20)*cH2;
+      ctx2.strokeStyle='rgba(0,0,0,0.08)'; ctx2.lineWidth=0.5; ctx2.setLineDash([4,3]);
+      ctx2.beginPath(); ctx2.moveTo(midX,PAD_T); ctx2.lineTo(midX,PAD_T+cH2); ctx2.stroke();
+      ctx2.beginPath(); ctx2.moveTo(PAD_L,midY); ctx2.lineTo(W2-PAD_R,midY); ctx2.stroke();
+      ctx2.setLineDash([]);
+
+      // Dots
+      withRec.forEach(s => {
+        const x = PAD_L + (s.recovery/100)*cW2;
+        const y = PAD_T + cH2 - (Math.min(s.strain,20)/20)*cH2;
+        ctx2.beginPath();
+        ctx2.arc(x, y, 5, 0, Math.PI*2);
+        ctx2.fillStyle = s.type === 'singles' ? 'rgba(37,99,235,0.6)' : 'rgba(22,163,74,0.6)';
+        ctx2.fill();
+      });
+    }
+  }
+  }, 0);
 }
 
 // Boot
