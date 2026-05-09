@@ -86,7 +86,7 @@ jobs:
               client_id: CLIENT_ID,
               client_secret: CLIENT_SECRET,
               redirect_uri: 'https://oauth.pstmn.io/v1/browser-callback',
-              scope: 'offline'
+              scope: 'read:workout read:cycles offline'
             });
 
             if (tokenResp.status !== 200) {
