@@ -152,18 +152,20 @@ jobs:
               const records = recResp.data.records || [];
               console.log('Recovery records on page:', records.length);
               if (records.length > 0) console.log('Sample record keys:', Object.keys(records[0]).join(', '));
+              // Log first record to see full structure
+              if (recPages === 1 && records.length > 0) {
+                console.log('Sample recovery record:', JSON.stringify(records[0]).substring(0, 400));
+              }
               records.forEach(r => {
-                // Try multiple date fields
-                const dateRaw = r.created_at || r.updated_at || r.cycle_start || r.start || '';
+                // Use updated_at as the cycle date (most reliable)
+                const dateRaw = r.updated_at || r.created_at || '';
                 if (!dateRaw) return;
                 const d = new Date(dateRaw);
                 if (d < cutoff) return;
                 const dateStr = d.toISOString().split('T')[0];
-                // Try multiple score fields
-                const score = (r.score && r.score.recovery_score) ||
-                              (r.score && r.score.score) ||
-                              r.recovery_score || r.score || null;
-                if (score !== null && score !== undefined) {
+                // Score is nested under score.recovery_score
+                const score = r.score && r.score.recovery_score !== undefined ? r.score.recovery_score : null;
+                if (score !== null) {
                   recoveryMap[dateStr] = Math.round(score);
                 }
               });
@@ -177,6 +179,10 @@ jobs:
               if (recPages > 20) break;
             } while (recNextToken);
             console.log('Recovery scores fetched for ' + Object.keys(recoveryMap).length + ' days.');
+            const sampleRecoveryDates = Object.keys(recoveryMap).sort().slice(-5);
+            console.log('Sample recovery dates (latest 5):', sampleRecoveryDates.join(', '));
+            const sampleSessionDates = sessions.slice(-5).map(s => s.date);
+            console.log('Sample session dates (latest 5):', sampleSessionDates.join(', '));
 
             const sessions = allWorkouts.map(w => {
               const d = new Date(w.start || w.created_at);
