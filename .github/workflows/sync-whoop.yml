@@ -86,7 +86,7 @@ jobs:
               client_id: CLIENT_ID,
               client_secret: CLIENT_SECRET,
               redirect_uri: 'https://oauth.pstmn.io/v1/browser-callback',
-              scope: 'read:workout read:cycles offline'
+              scope: 'read:workout read:cycles read:recovery offline'
             });
 
             if (tokenResp.status !== 200) {
@@ -135,34 +135,47 @@ jobs:
 
             console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
 
-            // Fetch recovery scores from cycle endpoint
-            console.log('Fetching recovery scores from cycle endpoint...');
+            // Fetch recovery scores from recovery endpoint
+            console.log('Fetching recovery scores...');
             const recoveryMap = {};
-            let cycleNextToken = null;
-            let cyclePages = 0;
+            let recNextToken = null;
+            let recPages = 0;
             do {
-              let cycleUrl = 'https://api.prod.whoop.com/developer/v2/cycle?limit=25';
-              if (cycleNextToken) cycleUrl += '&nextToken=' + encodeURIComponent(cycleNextToken);
-              const cycleResp = await get(cycleUrl, accessToken);
-              if (cycleResp.status !== 200) {
-                console.log('Cycle fetch failed — recovery will be null:', JSON.stringify(cycleResp.data));
+              let recUrl = 'https://api.prod.whoop.com/developer/v2/recovery?limit=25';
+              if (recNextToken) recUrl += '&nextToken=' + encodeURIComponent(recNextToken);
+              const recResp = await get(recUrl, accessToken);
+              console.log('Recovery page ' + (recPages+1) + ' status:', recResp.status);
+              if (recResp.status !== 200) {
+                console.log('Recovery fetch failed:', JSON.stringify(recResp.data).substring(0,200));
                 break;
               }
-              const cycles = cycleResp.data.records || [];
-              cycles.forEach(c => {
-                if (!c.start) return;
-                const d = new Date(c.start);
+              const records = recResp.data.records || [];
+              console.log('Recovery records on page:', records.length);
+              if (records.length > 0) console.log('Sample record keys:', Object.keys(records[0]).join(', '));
+              records.forEach(r => {
+                // Try multiple date fields
+                const dateRaw = r.created_at || r.updated_at || r.cycle_start || r.start || '';
+                if (!dateRaw) return;
+                const d = new Date(dateRaw);
                 if (d < cutoff) return;
                 const dateStr = d.toISOString().split('T')[0];
-                const recovery = c.score && c.score.recovery_score ? Math.round(c.score.recovery_score) : null;
-                if (recovery !== null) recoveryMap[dateStr] = recovery;
+                // Try multiple score fields
+                const score = (r.score && r.score.recovery_score) ||
+                              (r.score && r.score.score) ||
+                              r.recovery_score || r.score || null;
+                if (score !== null && score !== undefined) {
+                  recoveryMap[dateStr] = Math.round(score);
+                }
               });
-              cycleNextToken = cycleResp.data.next_token || null;
-              cyclePages++;
-              const oldestCycle = cycles[cycles.length - 1];
-              if (oldestCycle && new Date(oldestCycle.start || '') < cutoff) break;
-              if (cyclePages > 20) break;
-            } while (cycleNextToken);
+              recNextToken = recResp.data.next_token || null;
+              recPages++;
+              const oldest = records[records.length - 1];
+              if (oldest) {
+                const oldestDate = new Date(oldest.created_at || oldest.start || '');
+                if (oldestDate < cutoff) break;
+              }
+              if (recPages > 20) break;
+            } while (recNextToken);
             console.log('Recovery scores fetched for ' + Object.keys(recoveryMap).length + ' days.');
 
             const sessions = allWorkouts.map(w => {
