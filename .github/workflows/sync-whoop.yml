@@ -203,7 +203,7 @@ jobs:
                 const existing = existingMap.get(s.id);
                 const updates = {};
                 if (!existing.duration && s.duration) updates.duration = s.duration;
-                if (!existing.recovery && s.recovery) updates.recovery = s.recovery;
+                if (s.recovery !== null && s.recovery !== undefined) updates.recovery = s.recovery;
                 if (Object.keys(updates).length > 0) {
                   existingMap.set(s.id, { ...existing, ...updates });
                 }
