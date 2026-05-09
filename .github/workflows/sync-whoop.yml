@@ -135,6 +135,36 @@ jobs:
 
             console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
 
+            // Fetch recovery scores from cycle endpoint
+            console.log('Fetching recovery scores from cycle endpoint...');
+            const recoveryMap = {};
+            let cycleNextToken = null;
+            let cyclePages = 0;
+            do {
+              let cycleUrl = 'https://api.prod.whoop.com/developer/v2/cycle?limit=25';
+              if (cycleNextToken) cycleUrl += '&nextToken=' + encodeURIComponent(cycleNextToken);
+              const cycleResp = await get(cycleUrl, accessToken);
+              if (cycleResp.status !== 200) {
+                console.log('Cycle fetch failed — recovery will be null:', JSON.stringify(cycleResp.data));
+                break;
+              }
+              const cycles = cycleResp.data.records || [];
+              cycles.forEach(c => {
+                if (!c.start) return;
+                const d = new Date(c.start);
+                if (d < cutoff) return;
+                const dateStr = d.toISOString().split('T')[0];
+                const recovery = c.score && c.score.recovery_score ? Math.round(c.score.recovery_score) : null;
+                if (recovery !== null) recoveryMap[dateStr] = recovery;
+              });
+              cycleNextToken = cycleResp.data.next_token || null;
+              cyclePages++;
+              const oldestCycle = cycles[cycles.length - 1];
+              if (oldestCycle && new Date(oldestCycle.start || '') < cutoff) break;
+              if (cyclePages > 20) break;
+            } while (cycleNextToken);
+            console.log('Recovery scores fetched for ' + Object.keys(recoveryMap).length + ' days.');
+
             const sessions = allWorkouts.map(w => {
               const d = new Date(w.start || w.created_at);
               const dateStr = d.toISOString().split('T')[0];
@@ -143,13 +173,14 @@ jobs:
               if (w.end && w.start) {
                 duration = Math.round((new Date(w.end) - new Date(w.start)) / 60000);
               }
+              const recovery = recoveryMap[dateStr] || null;
               return {
                 id: 'whoop-api-' + (w.id || w.workout_id),
                 date: dateStr,
                 strain,
                 type: null,
                 duration,
-                recovery: null,
+                recovery,
                 source: 'whoop-api'
               };
             });
@@ -168,10 +199,13 @@ jobs:
             let added = 0, preserved = 0;
             sessions.forEach(s => {
               if (existingMap.has(s.id)) {
-                // Update duration if we now have it
+                // Update duration and recovery if we now have them
                 const existing = existingMap.get(s.id);
-                if (!existing.duration && s.duration) {
-                  existingMap.set(s.id, { ...existing, duration: s.duration });
+                const updates = {};
+                if (!existing.duration && s.duration) updates.duration = s.duration;
+                if (!existing.recovery && s.recovery) updates.recovery = s.recovery;
+                if (Object.keys(updates).length > 0) {
+                  existingMap.set(s.id, { ...existing, ...updates });
                 }
                 preserved++;
               } else {
