@@ -817,7 +817,7 @@ function renderAnalytics() {
         <div style="flex:1;background:var(--green-light);border-radius:2px 2px 0 0;height:${dh}%;"></div>
       </div>
       <div style="font-size:10px;color:var(--text-secondary);">${m.label}</div>
-      <div style="font-size:10px;color:var(--text-secondary);">${m.all.length}s</div>
+      <div style="font-size:10px;color:var(--text-secondary);">${m.all.length} sess</div>
     </div>`;
   });
   momHtml += '</div>';
@@ -837,10 +837,11 @@ function renderAnalytics() {
   } else {
     // Build scatter plot as canvas
     recoveryHtml = '<div style="position:relative;"><canvas id="recovery-chart" style="width:100%;height:220px;display:block;"></canvas></div>';
-    recoveryHtml += '<div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--text-secondary);">';
-    recoveryHtml += '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block;"></span>Singles</span>';
-    recoveryHtml += '<span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;"></span>Doubles</span>';
-    recoveryHtml += '<span style="margin-left:auto;">X axis: Recovery % · Y axis: Strain</span></div>';
+    recoveryHtml += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">';
+    recoveryHtml += '<button id="rec-toggle-both" onclick="setRecoveryFilter(\'both\')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border-md);background:var(--bg-secondary);color:var(--text);font-family:inherit;" class="rec-toggle-active">Both</button>';
+    recoveryHtml += '<button id="rec-toggle-singles" onclick="setRecoveryFilter(\'singles\')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border-md);color:var(--text-secondary);background:none;font-family:inherit;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-right:4px;vertical-align:middle;"></span>Singles</button>';
+    recoveryHtml += '<button id="rec-toggle-doubles" onclick="setRecoveryFilter(\'doubles\')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border-md);color:var(--text-secondary);background:none;font-family:inherit;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle;"></span>Doubles</button>';
+    recoveryHtml += '<span style="margin-left:auto;font-size:11px;color:var(--text-secondary);">X axis: Recovery % · Y axis: Strain</span></div>';
 
     // Zone breakdown
     const greenSessions = withRecovery.filter(s => s.recovery >= 67);
@@ -917,7 +918,7 @@ function renderAnalytics() {
         <div class="an-stat"><div class="an-stat-label">Rest days</div><div class="an-stat-val">${restPct}%</div><div class="an-stat-sub">of days</div></div>
       </div>
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Last 90 days — each bar = one week</div>
-      <canvas id="freq-chart" style="width:100%;height:80px;display:block;"></canvas>
+      <div class="chart-wrap"><canvas id="freq-chart" style="width:100%;height:80px;display:block;"></canvas><div class="chart-tooltip" id="freq-tooltip"></div></div>
     </div>
 
     <div class="an-card">
@@ -986,61 +987,102 @@ function renderAnalytics() {
       ctx.textAlign = 'center';
       ctx.fillText(c, x+bw/2, H-1);
     });
+
+    // Wire tooltip for frequency chart
+    const freqTooltip = document.getElementById('freq-tooltip');
+    if (freqTooltip) {
+      canvas.onmousemove = function(e) {
+        const idx = Math.floor(e.offsetX / (bw + 3));
+        if (idx < 0 || idx >= weeks.length) { freqTooltip.style.opacity=0; return; }
+        const weeksAgo = weeks.length - 1 - idx;
+        const weekLabel = weeksAgo === 0 ? 'This week' : weeksAgo === 1 ? 'Last week' : weeksAgo + ' weeks ago';
+        const count = weeks[idx];
+        freqTooltip.innerHTML = '<strong>' + weekLabel + '</strong><br>Sessions: <strong style="color:#63b3ed">' + count + '</strong>';
+        const tx = e.offsetX + 12;
+        const ty = e.offsetY - 44;
+        freqTooltip.style.left = (tx + 130 > W ? tx - 150 : tx) + 'px';
+        freqTooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
+        freqTooltip.style.opacity = 1;
+      };
+      canvas.onmouseleave = function() { freqTooltip.style.opacity = 0; };
+    }
   // Draw recovery scatter if data available
   const withRec = all.filter(s => s.recovery !== null && s.recovery !== undefined);
   if (withRec.length >= 3) {
-    const recCanvas = document.getElementById('recovery-chart');
-    if (recCanvas) {
-      const dpr2 = window.devicePixelRatio||1;
-      const W2 = recCanvas.offsetWidth||400, H2 = 220;
-      recCanvas.width = W2*dpr2; recCanvas.height = H2*dpr2;
-      const ctx2 = recCanvas.getContext('2d');
-      ctx2.scale(dpr2, dpr2);
-      ctx2.clearRect(0,0,W2,H2);
-
-      const PAD_L=36, PAD_R=12, PAD_T=12, PAD_B=24;
-      const cW2=W2-PAD_L-PAD_R, cH2=H2-PAD_T-PAD_B;
-
-      // Grid lines
-      [0,25,50,75,100].forEach(v => {
-        const x = PAD_L + (v/100)*cW2;
-        ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5; ctx2.setLineDash([]);
-        ctx2.beginPath(); ctx2.moveTo(x,PAD_T); ctx2.lineTo(x,PAD_T+cH2); ctx2.stroke();
-        ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='center';
-        ctx2.fillText(v+'%', x, H2-6);
-      });
-      [0,5,10,15,20].forEach(v => {
-        const y = PAD_T+cH2-(v/20)*cH2;
-        ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5;
-        ctx2.beginPath(); ctx2.moveTo(PAD_L,y); ctx2.lineTo(W2-PAD_R,y); ctx2.stroke();
-        ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='right';
-        ctx2.fillText(v, PAD_L-3, y+3);
-      });
-
-      // Axes
-      ctx2.strokeStyle='rgba(0,0,0,0.12)'; ctx2.lineWidth=0.5;
-      ctx2.beginPath(); ctx2.moveTo(PAD_L,PAD_T); ctx2.lineTo(PAD_L,PAD_T+cH2); ctx2.lineTo(W2-PAD_R,PAD_T+cH2); ctx2.stroke();
-
-      // Quadrant dividers
-      const midX = PAD_L + 0.5*cW2;
-      const midY = PAD_T + cH2 - (13/20)*cH2;
-      ctx2.strokeStyle='rgba(0,0,0,0.08)'; ctx2.lineWidth=0.5; ctx2.setLineDash([4,3]);
-      ctx2.beginPath(); ctx2.moveTo(midX,PAD_T); ctx2.lineTo(midX,PAD_T+cH2); ctx2.stroke();
-      ctx2.beginPath(); ctx2.moveTo(PAD_L,midY); ctx2.lineTo(W2-PAD_R,midY); ctx2.stroke();
-      ctx2.setLineDash([]);
-
-      // Dots
-      withRec.forEach(s => {
-        const x = PAD_L + (s.recovery/100)*cW2;
-        const y = PAD_T + cH2 - (Math.min(s.strain,20)/20)*cH2;
-        ctx2.beginPath();
-        ctx2.arc(x, y, 5, 0, Math.PI*2);
-        ctx2.fillStyle = s.type === 'singles' ? 'rgba(37,99,235,0.6)' : 'rgba(22,163,74,0.6)';
-        ctx2.fill();
-      });
-    }
+    drawRecoveryScatter();
   }
   }, 0);
+}
+
+// Recovery scatter filter
+let _recoveryFilter = 'both';
+function setRecoveryFilter(type) {
+  _recoveryFilter = type;
+  // Update button styles
+  ['both','singles','doubles'].forEach(t => {
+    const btn = document.getElementById('rec-toggle-'+t);
+    if (!btn) return;
+    if (t === type) {
+      btn.style.background = 'var(--bg-secondary)';
+      btn.style.color = 'var(--text)';
+      btn.style.borderColor = 'var(--border-md)';
+    } else {
+      btn.style.background = 'none';
+      btn.style.color = 'var(--text-secondary)';
+      btn.style.borderColor = 'var(--border-md)';
+    }
+  });
+  drawRecoveryScatter();
+}
+
+function drawRecoveryScatter() {
+  const all = sessions.filter(s => s.type === 'singles' || s.type === 'doubles');
+  const withRec = all.filter(s => s.recovery !== null && s.recovery !== undefined);
+  const filtered = _recoveryFilter === 'both' ? withRec : withRec.filter(s => s.type === _recoveryFilter);
+  const recCanvas = document.getElementById('recovery-chart');
+  if (!recCanvas || filtered.length < 1) return;
+  const dpr2 = window.devicePixelRatio||1;
+  const W2 = recCanvas.offsetWidth||400, H2 = 220;
+  recCanvas.width = W2*dpr2; recCanvas.height = H2*dpr2;
+  const ctx2 = recCanvas.getContext('2d');
+  ctx2.scale(dpr2, dpr2);
+  ctx2.clearRect(0,0,W2,H2);
+  const PAD_L=36, PAD_R=12, PAD_T=12, PAD_B=24;
+  const cW2=W2-PAD_L-PAD_R, cH2=H2-PAD_T-PAD_B;
+  // Grid lines
+  [0,25,50,75,100].forEach(v => {
+    const x = PAD_L + (v/100)*cW2;
+    ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5; ctx2.setLineDash([]);
+    ctx2.beginPath(); ctx2.moveTo(x,PAD_T); ctx2.lineTo(x,PAD_T+cH2); ctx2.stroke();
+    ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='center';
+    ctx2.fillText(v+'%', x, H2-6);
+  });
+  [0,5,10,15,20].forEach(v => {
+    const y = PAD_T+cH2-(v/20)*cH2;
+    ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5;
+    ctx2.beginPath(); ctx2.moveTo(PAD_L,y); ctx2.lineTo(W2-PAD_R,y); ctx2.stroke();
+    ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='right';
+    ctx2.fillText(v, PAD_L-3, y+3);
+  });
+  // Axes
+  ctx2.strokeStyle='rgba(0,0,0,0.12)'; ctx2.lineWidth=0.5;
+  ctx2.beginPath(); ctx2.moveTo(PAD_L,PAD_T); ctx2.lineTo(PAD_L,PAD_T+cH2); ctx2.lineTo(W2-PAD_R,PAD_T+cH2); ctx2.stroke();
+  // Quadrant dividers
+  const midX = PAD_L + 0.5*cW2;
+  const midY = PAD_T + cH2 - (13/20)*cH2;
+  ctx2.strokeStyle='rgba(0,0,0,0.08)'; ctx2.lineWidth=0.5; ctx2.setLineDash([4,3]);
+  ctx2.beginPath(); ctx2.moveTo(midX,PAD_T); ctx2.lineTo(midX,PAD_T+cH2); ctx2.stroke();
+  ctx2.beginPath(); ctx2.moveTo(PAD_L,midY); ctx2.lineTo(W2-PAD_R,midY); ctx2.stroke();
+  ctx2.setLineDash([]);
+  // Dots
+  filtered.forEach(s => {
+    const x = PAD_L + (s.recovery/100)*cW2;
+    const y = PAD_T + cH2 - (Math.min(s.strain,20)/20)*cH2;
+    ctx2.beginPath();
+    ctx2.arc(x, y, 5, 0, Math.PI*2);
+    ctx2.fillStyle = s.type === 'singles' ? 'rgba(37,99,235,0.6)' : 'rgba(22,163,74,0.6)';
+    ctx2.fill();
+  });
 }
 
 // Boot
