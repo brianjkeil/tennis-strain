@@ -721,6 +721,7 @@ function loadThreshold() {
 function renderAnalytics() {
   const container = document.getElementById('analytics-content');
   if (!container) return;
+  _recoveryFilter = 'both'; // reset toggle on re-render
 
   const singles = sessions.filter(s => s.type === 'singles').sort((a,b) => new Date(a.date)-new Date(b.date));
   const doubles = sessions.filter(s => s.type === 'doubles').sort((a,b) => new Date(a.date)-new Date(b.date));
@@ -803,24 +804,8 @@ function renderAnalytics() {
     calDays.push({ date: ds, type: typeMap[ds] || null, isToday: i === 0 });
   }
 
-  // Month bars HTML
-  let momHtml = '<div style="display:flex;gap:12px;align-items:flex-end;height:100px;margin-bottom:8px;">';
-  monthKeys.forEach(k => {
-    const m = months[k];
-    const h = Math.round((avg(m.all) / maxMonthAvg) * 100);
-    const sh = m.singles.length ? Math.round((avg(m.singles) / maxMonthAvg) * 100) : 0;
-    const dh = m.doubles.length ? Math.round((avg(m.doubles) / maxMonthAvg) * 100) : 0;
-    momHtml += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">
-      <div style="font-size:11px;font-family:var(--font-mono);color:var(--text-secondary);">${avg(m.all).toFixed(1)}</div>
-      <div style="display:flex;gap:2px;align-items:flex-end;width:100%;height:80px;">
-        <div style="flex:1;background:var(--blue-light);border-radius:2px 2px 0 0;height:${sh}%;"></div>
-        <div style="flex:1;background:var(--green-light);border-radius:2px 2px 0 0;height:${dh}%;"></div>
-      </div>
-      <div style="font-size:10px;color:var(--text-secondary);">${m.label}</div>
-      <div style="font-size:10px;color:var(--text-secondary);">${m.all.length} sess</div>
-    </div>`;
-  });
-  momHtml += '</div>';
+  // Month bars — drawn on canvas in setTimeout
+  const momHtml = `<div class="chart-wrap"><canvas id="month-chart" style="width:100%;height:120px;display:block;"></canvas><div class="chart-tooltip" id="month-tooltip"></div></div>`;
 
   // Streak squares HTML
   let streakHtml = '';
@@ -836,7 +821,7 @@ function renderAnalytics() {
     recoveryHtml = '<div style="font-size:13px;color:var(--text-secondary);padding:20px 0;text-align:center;">Recovery data will appear here after the next workflow sync. The workflow now fetches recovery scores daily from WHOOP.</div>';
   } else {
     // Build scatter plot as canvas
-    recoveryHtml = '<div style="position:relative;"><canvas id="recovery-chart" style="width:100%;height:220px;display:block;"></canvas></div>';
+    recoveryHtml = '<div style="position:relative;"><canvas id="recovery-chart" style="width:100%;height:220px;display:block;"></canvas><div class="chart-tooltip" id="recovery-tooltip"></div></div>';
     recoveryHtml += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">';
     recoveryHtml += '<button id="rec-toggle-both" onclick="setRecoveryFilter(\'both\')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border-md);background:var(--bg-secondary);color:var(--text);font-family:inherit;" class="rec-toggle-active">Both</button>';
     recoveryHtml += '<button id="rec-toggle-singles" onclick="setRecoveryFilter(\'singles\')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border-md);color:var(--text-secondary);background:none;font-family:inherit;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-right:4px;vertical-align:middle;"></span>Singles</button>';
@@ -872,10 +857,10 @@ function renderAnalytics() {
     <div class="an-card">
       <div class="an-eyebrow">Load progression</div>
       <div class="an-title">Monthly Strain Average</div>
-      ${momHtml}
-      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-secondary);">
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--blue-light);display:inline-block;"></span>Singles</span>
-        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:var(--green-light);display:inline-block;"></span>Doubles</span>
+      <div class="chart-wrap">${momHtml}</div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-secondary);margin-top:6px;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#BFDBFE;display:inline-block;"></span>Singles</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#BBF7D0;display:inline-block;"></span>Doubles</span>
       </div>
     </div>
 
@@ -918,7 +903,7 @@ function renderAnalytics() {
         <div class="an-stat"><div class="an-stat-label">Rest days</div><div class="an-stat-val">${restPct}%</div><div class="an-stat-sub">of days</div></div>
       </div>
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">Last 90 days — each bar = one week</div>
-      <div class="chart-wrap"><canvas id="freq-chart" style="width:100%;height:80px;display:block;"></canvas><div class="chart-tooltip" id="freq-tooltip"></div></div>
+      <div class="chart-wrap"><canvas id="freq-chart" style="width:100%;height:90px;display:block;"></canvas><div class="chart-tooltip" id="freq-tooltip"></div></div>
     </div>
 
     <div class="an-card">
@@ -946,71 +931,183 @@ function renderAnalytics() {
     </div>
   `;
 
-  // Draw frequency chart
+  // Draw all analytics canvases after DOM settles
   setTimeout(() => {
-    const canvas = document.getElementById('freq-chart');
-    if (!canvas) return;
-    const dpr = window.devicePixelRatio||1;
-    const W = canvas.offsetWidth||400, H = 80;
-    canvas.width = W*dpr; canvas.height = H*dpr;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0,0,W,H);
+    // ── Monthly Strain bars ──────────────────────────────────────────────
+    const mCanvas = document.getElementById('month-chart');
+    if (mCanvas) {
+      const dpr = window.devicePixelRatio||1;
+      const W = mCanvas.offsetWidth||400;
+      const H = 120;
+      mCanvas.width = W*dpr; mCanvas.height = H*dpr;
+      mCanvas.style.height = H+'px';
+      const mc = mCanvas.getContext('2d');
+      mc.scale(dpr, dpr);
+      mc.clearRect(0,0,W,H);
 
-    // Build weekly counts for last 90 days
-    const weeks = [];
-    for (let w = 0; w < 13; w++) {
-      let count = 0;
-      for (let d = 0; d < 7; d++) {
-        const offset = (12-w)*7 + (6-d);
-        const date = new Date(today);
-        date.setDate(date.getDate() - offset);
-        const ds = date.toISOString().split('T')[0];
-        if (dateSet.has(ds)) count++;
+      const PAD_T=18, PAD_B=32, PAD_L=4, PAD_R=4;
+      const barAreaH = H - PAD_T - PAD_B;
+      const colW = (W - PAD_L - PAD_R) / Math.max(monthKeys.length, 1);
+      const barPair = colW * 0.7;
+      const barW = barPair / 2 - 1;
+
+      monthKeys.forEach((k, i) => {
+        const m = months[k];
+        const sAvg = m.singles.length ? avg(m.singles) : 0;
+        const dAvg = m.doubles.length ? avg(m.doubles) : 0;
+        const allAvg = avg(m.all);
+        const cx = PAD_L + i * colW + colW / 2;
+
+        // Avg label on top
+        mc.fillStyle = '#9ca3af';
+        mc.font = `bold 10px -apple-system,sans-serif`;
+        mc.textAlign = 'center';
+        mc.fillText(allAvg.toFixed(1), cx, PAD_T - 4);
+
+        // Singles bar (left)
+        if (sAvg > 0) {
+          const bh = (sAvg / maxMonthAvg) * barAreaH;
+          const x = cx - barPair/2;
+          const y = PAD_T + barAreaH - bh;
+          mc.fillStyle = '#BFDBFE';
+          mc.beginPath();
+          if (mc.roundRect) mc.roundRect(x, y, barW, bh, [2,2,0,0]);
+          else mc.rect(x, y, barW, bh);
+          mc.fill();
+        }
+        // Doubles bar (right)
+        if (dAvg > 0) {
+          const bh = (dAvg / maxMonthAvg) * barAreaH;
+          const x = cx + 1;
+          const y = PAD_T + barAreaH - bh;
+          mc.fillStyle = '#BBF7D0';
+          mc.beginPath();
+          if (mc.roundRect) mc.roundRect(x, y, barW, bh, [2,2,0,0]);
+          else mc.rect(x, y, barW, bh);
+          mc.fill();
+        }
+
+        // Month label
+        mc.fillStyle = '#9ca3af';
+        mc.font = '10px -apple-system,sans-serif';
+        mc.textAlign = 'center';
+        mc.fillText(m.label, cx, H - PAD_B + 11);
+        // Session count
+        mc.fillText(m.all.length + ' sess', cx, H - PAD_B + 22);
+      });
+
+      // Tooltip
+      const mTip = document.getElementById('month-tooltip');
+      if (mTip) {
+        mCanvas.onmousemove = function(e) {
+          const rect = mCanvas.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const idx = Math.floor((mx - PAD_L) / ((W - PAD_L - PAD_R) / Math.max(monthKeys.length,1)));
+          if (idx < 0 || idx >= monthKeys.length) { mTip.style.opacity=0; return; }
+          const k = monthKeys[idx];
+          const m = months[k];
+          const sAvg = m.singles.length ? avg(m.singles).toFixed(1) : '—';
+          const dAvg = m.doubles.length ? avg(m.doubles).toFixed(1) : '—';
+          mTip.innerHTML =
+            '<strong>' + m.label + '</strong><br>' +
+            '<span style="color:#63b3ed">Singles avg: ' + sAvg + '</span> · ' + m.singles.length + ' sess<br>' +
+            '<span style="color:#4ade80">Doubles avg: ' + dAvg + '</span> · ' + m.doubles.length + ' sess';
+          const tx = e.offsetX + 12;
+          const ty = e.offsetY - 60;
+          mTip.style.left = (tx + 160 > W ? tx - 170 : tx) + 'px';
+          mTip.style.top = (ty < 0 ? 4 : ty) + 'px';
+          mTip.style.opacity = 1;
+        };
+        mCanvas.onmouseleave = () => { mTip.style.opacity = 0; };
       }
-      weeks.push(count);
     }
-    const maxW = Math.max(...weeks, 1);
-    const bw = (W / weeks.length) - 3;
-    weeks.forEach((c, i) => {
-      const bh = Math.max(2, (c/maxW)*(H-16));
-      const x = i*(bw+3);
-      const y = H-bh-4;
-      ctx.fillStyle = c >= 5 ? '#185FA5' : c >= 3 ? '#60a5fa' : '#bfdbfe';
-      ctx.globalAlpha = 0.85;
-      ctx.beginPath();
-      if(ctx.roundRect) ctx.roundRect(x,y,bw,bh,2); else ctx.rect(x,y,bw,bh);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = '#9ca3af';
-      ctx.font = '9px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(c, x+bw/2, H-1);
-    });
 
-    // Wire tooltip for frequency chart
-    const freqTooltip = document.getElementById('freq-tooltip');
-    if (freqTooltip) {
-      canvas.onmousemove = function(e) {
-        const idx = Math.floor(e.offsetX / (bw + 3));
-        if (idx < 0 || idx >= weeks.length) { freqTooltip.style.opacity=0; return; }
-        const weeksAgo = weeks.length - 1 - idx;
-        const weekLabel = weeksAgo === 0 ? 'This week' : weeksAgo === 1 ? 'Last week' : weeksAgo + ' weeks ago';
-        const count = weeks[idx];
-        freqTooltip.innerHTML = '<strong>' + weekLabel + '</strong><br>Sessions: <strong style="color:#63b3ed">' + count + '</strong>';
-        const tx = e.offsetX + 12;
-        const ty = e.offsetY - 44;
-        freqTooltip.style.left = (tx + 130 > W ? tx - 150 : tx) + 'px';
-        freqTooltip.style.top = (ty < 0 ? 4 : ty) + 'px';
-        freqTooltip.style.opacity = 1;
-      };
-      canvas.onmouseleave = function() { freqTooltip.style.opacity = 0; };
+    // ── Session Frequency bars ───────────────────────────────────────────
+    const fCanvas = document.getElementById('freq-chart');
+    if (fCanvas) {
+      const dpr = window.devicePixelRatio||1;
+      const W = fCanvas.offsetWidth||400;
+      const H = 90;
+      fCanvas.width = W*dpr; fCanvas.height = H*dpr;
+      fCanvas.style.height = H+'px';
+      const fc = fCanvas.getContext('2d');
+      fc.scale(dpr, dpr);
+      fc.clearRect(0,0,W,H);
+
+      const PAD_B = 18; // room for count label
+      const barAreaH = H - PAD_B;
+      const NUM_WEEKS = 13;
+      const weeks = [];
+      const weekDates = []; // start date of each week for tooltip
+      for (let w = 0; w < NUM_WEEKS; w++) {
+        let count = 0, singles_c = 0, doubles_c = 0;
+        const weekStart = new Date(today);
+        weekStart.setDate(weekStart.getDate() - (NUM_WEEKS-1-w)*7 - 6);
+        for (let d = 0; d < 7; d++) {
+          const dd = new Date(weekStart);
+          dd.setDate(dd.getDate() + d);
+          const ds = dd.toISOString().split('T')[0];
+          if (dateSet.has(ds)) {
+            count++;
+            if (typeMap[ds] === 'singles') singles_c++;
+            else if (typeMap[ds] === 'doubles') doubles_c++;
+          }
+        }
+        weeks.push({ count, singles_c, doubles_c, weekStart: new Date(weekStart) });
+        weekDates.push(weekStart);
+      }
+
+      const maxW = Math.max(...weeks.map(w=>w.count), 1);
+      const gap = 3;
+      const bw = Math.max(4, (W / NUM_WEEKS) - gap);
+      const totalBarW = bw + gap;
+
+      weeks.forEach((w, i) => {
+        if (w.count === 0) return;
+        const bh = Math.max(3, (w.count / maxW) * (barAreaH - 4));
+        const x = i * totalBarW + (W - NUM_WEEKS * totalBarW) / 2;
+        const y = barAreaH - bh;
+        fc.fillStyle = w.count >= 5 ? '#185FA5' : w.count >= 3 ? '#60a5fa' : '#bfdbfe';
+        fc.globalAlpha = 0.85;
+        fc.beginPath();
+        if (fc.roundRect) fc.roundRect(x, y, bw, bh, 2); else fc.rect(x, y, bw, bh);
+        fc.fill();
+        fc.globalAlpha = 1;
+        // Count label at bottom
+        fc.fillStyle = '#9ca3af';
+        fc.font = '9px sans-serif';
+        fc.textAlign = 'center';
+        fc.fillText(w.count, x + bw/2, H - 4);
+      });
+
+      // Tooltip
+      const fTip = document.getElementById('freq-tooltip');
+      if (fTip) {
+        fCanvas.onmousemove = function(e) {
+          const xOff = e.offsetX;
+          const originX = (W - NUM_WEEKS * totalBarW) / 2;
+          const idx = Math.floor((xOff - originX) / totalBarW);
+          if (idx < 0 || idx >= NUM_WEEKS) { fTip.style.opacity=0; return; }
+          const w = weeks[idx];
+          const weeksAgo = NUM_WEEKS - 1 - idx;
+          const lbl = weeksAgo === 0 ? 'This week' : weeksAgo === 1 ? 'Last week' : weeksAgo + ' weeks ago';
+          fTip.innerHTML =
+            '<strong>' + lbl + '</strong><br>' +
+            'Sessions: <strong style="color:#63b3ed">' + w.count + '</strong><br>' +
+            '<span style="color:#63b3ed">Singles: ' + w.singles_c + '</span> · <span style="color:#4ade80">Doubles: ' + w.doubles_c + '</span>';
+          const tx = e.offsetX + 12;
+          const ty = e.offsetY - 60;
+          fTip.style.left = (tx + 160 > W ? tx - 170 : tx) + 'px';
+          fTip.style.top = (ty < 0 ? 4 : ty) + 'px';
+          fTip.style.opacity = 1;
+        };
+        fCanvas.onmouseleave = () => { fTip.style.opacity = 0; };
+      }
     }
-  // Draw recovery scatter if data available
-  const withRec = all.filter(s => s.recovery !== null && s.recovery !== undefined);
-  if (withRec.length >= 3) {
+
+    // ── Recovery scatter ─────────────────────────────────────────────────
     drawRecoveryScatter();
-  }
+
   }, 0);
 }
 
@@ -1040,49 +1137,91 @@ function drawRecoveryScatter() {
   const withRec = all.filter(s => s.recovery !== null && s.recovery !== undefined);
   const filtered = _recoveryFilter === 'both' ? withRec : withRec.filter(s => s.type === _recoveryFilter);
   const recCanvas = document.getElementById('recovery-chart');
-  if (!recCanvas || filtered.length < 1) return;
-  const dpr2 = window.devicePixelRatio||1;
-  const W2 = recCanvas.offsetWidth||400, H2 = 220;
-  recCanvas.width = W2*dpr2; recCanvas.height = H2*dpr2;
-  const ctx2 = recCanvas.getContext('2d');
-  ctx2.scale(dpr2, dpr2);
-  ctx2.clearRect(0,0,W2,H2);
-  const PAD_L=36, PAD_R=12, PAD_T=12, PAD_B=24;
-  const cW2=W2-PAD_L-PAD_R, cH2=H2-PAD_T-PAD_B;
-  // Grid lines
+  if (!recCanvas) return;
+  if (filtered.length < 1) return;
+
+  const dpr = window.devicePixelRatio||1;
+  const W = recCanvas.offsetWidth||400, H = 220;
+  recCanvas.width = W*dpr; recCanvas.height = H*dpr;
+  recCanvas.style.height = H+'px';
+  const ctx = recCanvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const PAD_L=40, PAD_R=14, PAD_T=14, PAD_B=26;
+  const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
+
+  // Grid lines + axis labels
   [0,25,50,75,100].forEach(v => {
-    const x = PAD_L + (v/100)*cW2;
-    ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5; ctx2.setLineDash([]);
-    ctx2.beginPath(); ctx2.moveTo(x,PAD_T); ctx2.lineTo(x,PAD_T+cH2); ctx2.stroke();
-    ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='center';
-    ctx2.fillText(v+'%', x, H2-6);
+    const x = PAD_L + (v/100)*cW;
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x,PAD_T); ctx.lineTo(x,PAD_T+cH); ctx.stroke();
+    ctx.fillStyle='#9ca3af'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(v+'%', x, H-6);
   });
   [0,5,10,15,20].forEach(v => {
-    const y = PAD_T+cH2-(v/20)*cH2;
-    ctx2.strokeStyle='rgba(0,0,0,0.06)'; ctx2.lineWidth=0.5;
-    ctx2.beginPath(); ctx2.moveTo(PAD_L,y); ctx2.lineTo(W2-PAD_R,y); ctx2.stroke();
-    ctx2.fillStyle='#9ca3af'; ctx2.font='9px sans-serif'; ctx2.textAlign='right';
-    ctx2.fillText(v, PAD_L-3, y+3);
+    const y = PAD_T+cH-(v/20)*cH;
+    ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(PAD_L,y); ctx.lineTo(W-PAD_R,y); ctx.stroke();
+    ctx.fillStyle='#9ca3af'; ctx.font='9px sans-serif'; ctx.textAlign='right';
+    ctx.fillText(v, PAD_L-4, y+3);
   });
+
   // Axes
-  ctx2.strokeStyle='rgba(0,0,0,0.12)'; ctx2.lineWidth=0.5;
-  ctx2.beginPath(); ctx2.moveTo(PAD_L,PAD_T); ctx2.lineTo(PAD_L,PAD_T+cH2); ctx2.lineTo(W2-PAD_R,PAD_T+cH2); ctx2.stroke();
+  ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T); ctx.lineTo(PAD_L,PAD_T+cH); ctx.lineTo(W-PAD_R,PAD_T+cH); ctx.stroke();
+
   // Quadrant dividers
-  const midX = PAD_L + 0.5*cW2;
-  const midY = PAD_T + cH2 - (13/20)*cH2;
-  ctx2.strokeStyle='rgba(0,0,0,0.08)'; ctx2.lineWidth=0.5; ctx2.setLineDash([4,3]);
-  ctx2.beginPath(); ctx2.moveTo(midX,PAD_T); ctx2.lineTo(midX,PAD_T+cH2); ctx2.stroke();
-  ctx2.beginPath(); ctx2.moveTo(PAD_L,midY); ctx2.lineTo(W2-PAD_R,midY); ctx2.stroke();
-  ctx2.setLineDash([]);
-  // Dots
-  filtered.forEach(s => {
-    const x = PAD_L + (s.recovery/100)*cW2;
-    const y = PAD_T + cH2 - (Math.min(s.strain,20)/20)*cH2;
-    ctx2.beginPath();
-    ctx2.arc(x, y, 5, 0, Math.PI*2);
-    ctx2.fillStyle = s.type === 'singles' ? 'rgba(37,99,235,0.6)' : 'rgba(22,163,74,0.6)';
-    ctx2.fill();
+  ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=0.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(PAD_L+0.5*cW,PAD_T); ctx.lineTo(PAD_L+0.5*cW,PAD_T+cH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD_L,PAD_T+cH-(13/20)*cH); ctx.lineTo(W-PAD_R,PAD_T+cH-(13/20)*cH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Build dot positions for hit-test
+  const dots = filtered.map(s => ({
+    x: PAD_L + (s.recovery/100)*cW,
+    y: PAD_T + cH - (Math.min(s.strain,20)/20)*cH,
+    s
+  }));
+
+  // Draw dots
+  dots.forEach(d => {
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, 5, 0, Math.PI*2);
+    ctx.fillStyle = d.s.type === 'singles' ? 'rgba(37,99,235,0.65)' : 'rgba(22,163,74,0.65)';
+    ctx.fill();
   });
+
+  // Tooltip
+  const tip = document.getElementById('recovery-tooltip');
+  if (tip) {
+    recCanvas.onmousemove = function(e) {
+      const rect = recCanvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      // Find nearest dot within 12px
+      let closest = null, minDist = 14;
+      dots.forEach(d => {
+        const dist = Math.sqrt((d.x-mx)**2 + (d.y-my)**2);
+        if (dist < minDist) { minDist=dist; closest=d; }
+      });
+      if (!closest) { tip.style.opacity=0; return; }
+      const s = closest.s;
+      const typeLabel = s.type === 'singles' ? 'Singles' : 'Doubles';
+      const dateLabel = formatTooltipDate(s.date);
+      tip.innerHTML =
+        '<strong>' + dateLabel + '</strong><br>' +
+        'Type: ' + typeLabel + '<br>' +
+        'Strain: <strong style="color:#63b3ed">' + s.strain.toFixed(1) + '</strong><br>' +
+        'Recovery: <strong style="color:#4ade80">' + s.recovery + '%</strong>';
+      const tx = closest.x + 12;
+      const ty = closest.y - 64;
+      tip.style.left = (tx + 160 > W ? closest.x - 170 : tx) + 'px';
+      tip.style.top = (ty < 0 ? closest.y + 8 : ty) + 'px';
+      tip.style.opacity = 1;
+    };
+    recCanvas.onmouseleave = () => { tip.style.opacity = 0; };
+  }
 }
 
 // Boot
