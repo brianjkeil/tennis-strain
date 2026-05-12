@@ -80,6 +80,7 @@ jobs:
 
           async function run() {
             console.log('Refreshing WHOOP access token...');
+            console.log('Token preview:', REFRESH_TOKEN ? REFRESH_TOKEN.substring(0,20) + '...' : 'MISSING');
             // FIX 1: Removed redirect_uri — not needed for refresh_token grant
             // and was likely contributing to the 400 malformed request error.
             const tokenResp = await post('https://api.prod.whoop.com/oauth/oauth2/token', {
