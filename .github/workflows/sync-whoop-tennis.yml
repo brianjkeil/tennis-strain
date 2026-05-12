@@ -81,8 +81,9 @@ jobs:
           async function run() {
             console.log('Refreshing WHOOP access token...');
             console.log('Token preview:', REFRESH_TOKEN ? REFRESH_TOKEN.substring(0,20) + '...' : 'MISSING');
-            // FIX 1: Removed redirect_uri — not needed for refresh_token grant
-            // and was likely contributing to the 400 malformed request error.
+            console.log('Client ID preview:', CLIENT_ID ? CLIENT_ID.substring(0,10) + '...' : 'MISSING');
+            console.log('Client Secret present:', CLIENT_SECRET ? 'YES (' + CLIENT_SECRET.length + ' chars)' : 'MISSING');
+
             const tokenResp = await post('https://api.prod.whoop.com/oauth/oauth2/token', {
               grant_type: 'refresh_token',
               refresh_token: REFRESH_TOKEN,
@@ -137,7 +138,6 @@ jobs:
 
             console.log('Found ' + allWorkouts.length + ' tennis sessions from 2026+');
 
-            // Fetch recovery scores from recovery endpoint
             console.log('Fetching recovery scores...');
             const recoveryMap = {};
             let recNextToken = null;
@@ -182,9 +182,6 @@ jobs:
             const sampleRecoveryDates = Object.keys(recoveryMap).sort().slice(-5);
             console.log('Sample recovery dates (latest 5):', sampleRecoveryDates.join(', '));
 
-            // FIX 2: sessions declaration moved ABOVE the log line that references it.
-            // Previously `sessions` was used on line ~103 before being declared on ~107,
-            // causing a ReferenceError crash even when the token refresh succeeded.
             const sessions = allWorkouts.map(w => {
               const d = new Date(w.start || w.created_at);
               const dateStr = d.toISOString().split('T')[0];
@@ -205,7 +202,6 @@ jobs:
               };
             });
 
-            // Now safe to log session dates — sessions is defined above
             const sampleSessionDates = sessions.slice(-5).map(s => s.date);
             console.log('Sample session dates (latest 5):', sampleSessionDates.join(', '));
 
