@@ -80,7 +80,7 @@ jobs:
 
           async function run() {
             console.log('Refreshing WHOOP access token...');
-            console.log('Token preview:', REFRESH_TOKEN ? REFRESH_TOKEN.substring(0,20) + '...' : 'MISSING');
+            console.log('Token preview:', REFRESH_TOKEN ? REFRESH_TOKEN.substring(0,20) + '...' + REFRESH_TOKEN.slice(-4) : 'MISSING');
             console.log('Client ID preview:', CLIENT_ID ? CLIENT_ID.substring(0,10) + '...' : 'MISSING');
             console.log('Client Secret present:', CLIENT_SECRET ? 'YES (' + CLIENT_SECRET.length + ' chars)' : 'MISSING');
 
@@ -101,6 +101,7 @@ jobs:
             const accessToken = tokenResp.data.access_token;
             const newRefreshToken = tokenResp.data.refresh_token;
             console.log('Token refreshed successfully.');
+            console.log('New token preview:', newRefreshToken.substring(0,20) + '...' + newRefreshToken.slice(-4));
 
             fs.writeFileSync('/tmp/new_refresh_token.txt', newRefreshToken);
             if (process.env.GITHUB_OUTPUT) {
@@ -265,6 +266,7 @@ jobs:
             echo "No new token found."
             exit 0
           fi
+          echo "New token preview: $(echo $NEW_TOKEN | cut -c1-20)...$(echo $NEW_TOKEN | rev | cut -c1-4 | rev)"
           echo "Updating WHOOP_REFRESH_TOKEN secret..."
 
           KEY_DATA=$(curl -s \
