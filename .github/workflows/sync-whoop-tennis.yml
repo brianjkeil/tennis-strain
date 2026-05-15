@@ -257,6 +257,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           REPO: ${{ github.repository }}
+        # GH_TOKEN is the env var the gh CLI looks for automatically
         run: |
           NEW_TOKEN=$(cat /tmp/new_refresh_token.txt 2>/dev/null)
           if [ -z "$NEW_TOKEN" ]; then
@@ -264,6 +265,7 @@ jobs:
             exit 0
           fi
           echo "New token preview: $(echo $NEW_TOKEN | cut -c1-20)...$(echo $NEW_TOKEN | rev | cut -c1-4 | rev)"
+          echo "GH_TOKEN length: ${#GH_TOKEN}"
           echo "Updating WHOOP_REFRESH_TOKEN via gh CLI..."
           echo "$NEW_TOKEN" | gh secret set WHOOP_REFRESH_TOKEN --repo "$REPO"
           echo "WHOOP_REFRESH_TOKEN updated successfully."
