@@ -937,10 +937,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-14T22:58:30.810Z",
+  "lastSync": "2026-05-15T14:30:49.097Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 103,
+    "added": 0,
+    "preserved": 104,
     "total": 104
   }
 }
