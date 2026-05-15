@@ -288,15 +288,21 @@ jobs:
           echo "Got key ID: $KEY_ID"
           pip install PyNaCl --break-system-packages -q
 
-          python3 << PYEOF
+          # FIX: Pass PUB_KEY and KEY_ID as environment variables instead of
+          # shell-interpolating them into Python source code, which can corrupt
+          # base64 values containing special characters like + / =
+          GITHUB_PUB_KEY="$PUB_KEY" GITHUB_KEY_ID="$KEY_ID" python3 << 'PYEOF'
           import base64, os, json, urllib.request, urllib.error
           from nacl import public
 
-          pub_key_b64 = "$PUB_KEY"
-          key_id = "$KEY_ID"
+          pub_key_b64 = os.environ['GITHUB_PUB_KEY']
+          key_id = os.environ['GITHUB_KEY_ID']
           new_token = open('/tmp/new_refresh_token.txt').read().strip()
           pat = os.environ['PAT_TOKEN']
           repo = os.environ['REPO']
+
+          print('Encrypting token for key_id:', key_id)
+          print('Pub key length:', len(pub_key_b64), 'chars')
 
           pub_key_bytes = base64.b64decode(pub_key_b64)
           box = public.SealedBox(public.PublicKey(pub_key_bytes))
