@@ -964,10 +964,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-17T20:35:13.002Z",
+  "lastSync": "2026-05-18T12:52:22.929Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 106,
+    "added": 0,
+    "preserved": 107,
     "total": 107
   }
 }
