@@ -982,10 +982,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-21T19:47:41.221Z",
+  "lastSync": "2026-05-22T02:49:45.285Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 108,
+    "added": 0,
+    "preserved": 109,
     "total": 109
   }
 }
