@@ -1000,10 +1000,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-25T19:21:58.825Z",
+  "lastSync": "2026-05-26T02:42:37.818Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 110,
+    "added": 0,
+    "preserved": 111,
     "total": 111
   }
 }
