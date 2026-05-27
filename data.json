@@ -1027,10 +1027,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-27T23:22:08.480Z",
+  "lastSync": "2026-05-27T23:31:41.910Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 113,
+    "added": 0,
+    "preserved": 114,
     "total": 114
   }
 }
