@@ -895,7 +895,7 @@
       "id": "whoop-api-91a7847b-59ed-452c-9503-4d7618e69ae5",
       "date": "2026-05-09",
       "strain": 9,
-      "type": null,
+      "type": "singles",
       "duration": 80,
       "recovery": 71,
       "source": "whoop-api"
@@ -931,7 +931,7 @@
       "id": "whoop-api-d1423322-ea43-4c39-a4a3-8a2c63b6e81f",
       "date": "2026-05-14",
       "strain": 8.7,
-      "type": null,
+      "type": "singles",
       "duration": 49,
       "recovery": 96,
       "source": "whoop-api"
@@ -949,7 +949,7 @@
       "id": "whoop-api-c3af3436-0808-445b-b4e2-64f915321e93",
       "date": "2026-05-16",
       "strain": 7.1,
-      "type": null,
+      "type": "singles",
       "duration": 82,
       "recovery": 68,
       "source": "whoop-api"
@@ -958,7 +958,7 @@
       "id": "whoop-api-b174f8b1-d487-488c-93d2-756a3cb51eee",
       "date": "2026-05-17",
       "strain": 6,
-      "type": null,
+      "type": "doubles",
       "duration": 170,
       "recovery": 44,
       "source": "whoop-api"
@@ -967,7 +967,7 @@
       "id": "whoop-api-6a8c2dc0-2166-4ed6-97d3-b69772909d97",
       "date": "2026-05-18",
       "strain": 11.9,
-      "type": null,
+      "type": "singles",
       "duration": 84,
       "recovery": 78,
       "source": "whoop-api"
@@ -1012,16 +1012,16 @@
       "id": "whoop-api-d1fb0913-ddbe-4b22-ad5e-885ad21897bf",
       "date": "2026-05-27",
       "strain": 8.1,
-      "type": null,
+      "type": "singles",
       "duration": 52,
       "recovery": 53,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-27T20:08:19.247Z",
+  "lastSync": "2026-05-27T23:14:16.291Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 112,
+    "added": 0,
+    "preserved": 113,
     "total": 113
   }
 }
