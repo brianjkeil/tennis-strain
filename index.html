@@ -684,13 +684,14 @@ function setupLineTooltip(canvasId, tooltipId, data, r7, r30) {
 }
 
 const WORKER_URL = 'https://tennis-tag-proxy.bjk1968.workers.dev/';
-let _thresholds = { singles: 13, doubles: 12 };
+let _thresholds = { all: 13, singles: 13, doubles: 12 };
 
 async function loadThresholdsFromServer() {
   try {
     const resp = await fetch(WORKER_URL + 'settings', { cache: 'no-store' });
     if (resp.ok) {
       const data = await resp.json();
+      if (data.all !== undefined) _thresholds.all = data.all;
       if (data.singles !== undefined) _thresholds.singles = data.singles;
       if (data.doubles !== undefined) _thresholds.doubles = data.doubles;
     }
