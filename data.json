@@ -904,7 +904,7 @@
       "id": "whoop-api-9a1de360-812d-48b2-bbcb-1ac52338a6d8",
       "date": "2026-05-10",
       "strain": 15.2,
-      "type": null,
+      "type": "doubles",
       "duration": 171,
       "recovery": 79,
       "source": "whoop-api"
@@ -913,7 +913,7 @@
       "id": "whoop-api-90bb2f1c-46ed-45c6-a096-53fe277cf844",
       "date": "2026-05-12",
       "strain": 12.5,
-      "type": null,
+      "type": "singles",
       "duration": 78,
       "recovery": 77,
       "source": "whoop-api"
@@ -922,7 +922,7 @@
       "id": "whoop-api-94ae98dd-5e6d-453d-9153-ba67b7ae5ef4",
       "date": "2026-05-14",
       "strain": 13.9,
-      "type": null,
+      "type": "singles",
       "duration": 85,
       "recovery": 96,
       "source": "whoop-api"
@@ -940,7 +940,7 @@
       "id": "whoop-api-7430e6f6-8d4d-48d3-b58c-9dc0d99a8557",
       "date": "2026-05-15",
       "strain": 12.1,
-      "type": null,
+      "type": "singles",
       "duration": 81,
       "recovery": 72,
       "source": "whoop-api"
@@ -976,7 +976,7 @@
       "id": "whoop-api-b377de32-ccaf-4805-8d20-ccd9c867e3a0",
       "date": "2026-05-21",
       "strain": 12.6,
-      "type": null,
+      "type": "singles",
       "duration": 95,
       "recovery": 85,
       "source": "whoop-api"
@@ -985,7 +985,7 @@
       "id": "whoop-api-c856b4bd-85b1-4a2a-9ae5-2df5abaa8087",
       "date": "2026-05-24",
       "strain": 10.5,
-      "type": null,
+      "type": "doubles",
       "duration": 170,
       "recovery": 54,
       "source": "whoop-api"
@@ -994,7 +994,7 @@
       "id": "whoop-api-6c170d3d-de6a-4930-af4d-cdf268c5b4e3",
       "date": "2026-05-25",
       "strain": 13.6,
-      "type": null,
+      "type": "singles",
       "duration": 93,
       "recovery": 67,
       "source": "whoop-api"
@@ -1003,7 +1003,7 @@
       "id": "whoop-api-59bb4886-774c-4d53-9087-1784089e24f8",
       "date": "2026-05-26",
       "strain": 12.9,
-      "type": null,
+      "type": "singles",
       "duration": 84,
       "recovery": 75,
       "source": "whoop-api"
@@ -1018,7 +1018,7 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-27T23:14:16.291Z",
+  "lastSync": "2026-05-27T23:18:00.694Z",
   "syncStats": {
     "added": 0,
     "preserved": 113,
