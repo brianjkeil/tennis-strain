@@ -307,33 +307,15 @@ function updateStatus(err) {
 }
 
 async function writeTagToGitHub(id, type) {
-  const PAT = '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';
-  const REPO = 'brianjkeil/tennis-strain';
+  const WORKER_URL = 'https://tennis-tag-proxy.bjk1968.workers.dev/';
   try {
-    let currentTags = {};
-    let sha = null;
-    const getResp = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/tags.json`,
-      { headers: { 'Authorization': `token ${PAT}`, 'Accept': 'application/vnd.github+json' } }
-    );
-    if (getResp.ok) {
-      const data = await getResp.json();
-      sha = data.sha;
-      currentTags = JSON.parse(atob(data.content.replace(/\n/g,'')));
-    }
-    currentTags[id] = type;
-    const body = { message: 'chore: update session tags', content: btoa(JSON.stringify(currentTags, null, 2)) };
-    if (sha) body.sha = sha;
-    const putResp = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/tags.json`,
-      {
-        method: 'PUT',
-        headers: { 'Authorization': `token ${PAT}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      }
-    );
-    if (!putResp.ok) {
-      const err = await putResp.json();
+    const resp = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, type })
+    });
+    if (!resp.ok) {
+      const err = await resp.json();
       console.warn('Tag write failed:', err);
     }
   } catch(e) { console.warn('Could not write tag to GitHub:', e); }
