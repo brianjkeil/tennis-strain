@@ -307,14 +307,14 @@ function updateStatus(err) {
 }
 
 async function writeTagToGitHub(id, type) {
-  const PAT = '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';
+  const PAT = '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';
   const REPO = 'brianjkeil/tennis-strain';
   try {
     let currentTags = {};
     let sha = null;
     const getResp = await fetch(
       `https://api.github.com/repos/${REPO}/contents/tags.json`,
-      { headers: { 'Authorization': `Bearer ${PAT}`, 'Accept': 'application/vnd.github+json' } }
+      { headers: { 'Authorization': `token ${PAT}`, 'Accept': 'application/vnd.github+json' } }
     );
     if (getResp.ok) {
       const data = await getResp.json();
@@ -328,7 +328,7 @@ async function writeTagToGitHub(id, type) {
       `https://api.github.com/repos/${REPO}/contents/tags.json`,
       {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${PAT}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `token ${PAT}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       }
     );
