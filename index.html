@@ -307,7 +307,6 @@ function updateStatus(err) {
 }
 
 async function writeTagToGitHub(id, type) {
-  const WORKER_URL = 'https://tennis-tag-proxy.bjk1968.workers.dev/';
   try {
     const resp = await fetch(WORKER_URL, {
       method: 'POST',
@@ -684,20 +683,44 @@ function setupLineTooltip(canvasId, tooltipId, data, r7, r30) {
   canvas.onmouseleave = function() { tooltip.style.opacity=0; };
 }
 
+const WORKER_URL = 'https://tennis-tag-proxy.bjk1968.workers.dev/';
+let _thresholds = { singles: 13, doubles: 12 };
+
+// Load thresholds from Worker/settings.json on startup
+async function loadThresholdsFromServer() {
+  try {
+    const resp = await fetch(WORKER_URL + 'settings', { cache: 'no-store' });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.singles) _thresholds.singles = data.singles;
+      if (data.doubles) _thresholds.doubles = data.doubles;
+    }
+  } catch(e) {}
+  // Apply to current view
+  const el = document.getElementById('threshold-inp');
+  if (el) el.value = _thresholds[activeType] || 15;
+}
+
 function saveThreshold() {
-  const val = document.getElementById('threshold-inp').value;
+  const val = parseFloat(document.getElementById('threshold-inp').value) || 15;
+  _thresholds[activeType] = val;
+  // Save to localStorage as fallback
   try { localStorage.setItem('bk-threshold-' + activeType, val); } catch(e) {}
+  // Save to server
+  fetch(WORKER_URL + 'settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(_thresholds)
+  }).catch(e => console.warn('Could not save threshold:', e));
 }
 
 function loadThreshold() {
-  let val = '15';
-  try {
-    const stored = localStorage.getItem('bk-threshold-' + activeType);
-    if (stored) val = stored;
-  } catch(e) {}
+  // Use in-memory value (loaded from server on startup)
+  const val = _thresholds[activeType] ||
+    parseFloat(localStorage.getItem('bk-threshold-' + activeType)) || 15;
   const el = document.getElementById('threshold-inp');
-  el.value = val;
-  return parseFloat(val) || 15;
+  if (el) el.value = val;
+  return val;
 }
 
 function renderAnalytics() {
@@ -1212,6 +1235,7 @@ loadThreshold();
 updateStatus();
 renderDash();
 fetchDataJson();
+loadThresholdsFromServer();
 </script>
 </body>
 </html>
