@@ -1030,16 +1030,16 @@
       "id": "whoop-api-c2465766-cfd0-48c4-851a-de811438c5e2",
       "date": "2026-05-28",
       "strain": 12.7,
-      "type": null,
+      "type": "singles",
       "duration": 81,
       "recovery": 93,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-05-28T20:59:03.416Z",
+  "lastSync": "2026-05-29T02:44:31.218Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 114,
+    "added": 0,
+    "preserved": 115,
     "total": 115
   }
 }
