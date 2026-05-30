@@ -1035,29 +1035,12 @@
       "recovery": 93,
       "source": "whoop-api"
     },
-    {
-      "id": "whoop-api-0791be7c-94be-4f1a-a84c-2934c304b2e2",
-      "date": "2026-05-30",
-      "strain": 6,
-      "type": null,
-      "duration": 26,
-      "recovery": 55,
-      "source": "whoop-api"
-    },
-    {
-      "id": "whoop-api-c4beb856-3cb4-4ac2-b8ac-4125eca709aa",
-      "date": "2026-05-30",
-      "strain": 6.2,
-      "type": null,
-      "duration": 54,
-      "recovery": 55,
-      "source": "whoop-api"
-    }
+    
   ],
   "lastSync": "2026-05-30T22:57:40.797Z",
   "syncStats": {
     "added": 0,
     "preserved": 115,
-    "total": 117
+    "total": 115
   }
 }
