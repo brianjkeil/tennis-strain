@@ -1039,13 +1039,13 @@
       "id": "whoop-api-53292532-7656-49a7-9f40-bb7c042fd6d3",
       "date": "2026-05-31",
       "strain": 11.4,
-      "type": null,
+      "type": "doubles",
       "duration": 167,
       "recovery": 51,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-06-01T03:31:40.264Z",
+  "lastSync": "2026-06-01T03:58:23.447Z",
   "syncStats": {
     "added": 0,
     "preserved": 116,
