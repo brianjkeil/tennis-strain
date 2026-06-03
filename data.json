@@ -1061,12 +1061,21 @@
       "duration": 78,
       "recovery": 54,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-617b3dda-6a33-46dc-8c97-fcfefe93c649",
+      "date": "2026-06-03",
+      "strain": 11.8,
+      "type": null,
+      "duration": 64,
+      "recovery": 92,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-06-03T16:27:58.264Z",
+  "lastSync": "2026-06-03T20:51:02.244Z",
   "syncStats": {
-    "added": 0,
+    "added": 1,
     "preserved": 118,
-    "total": 118
+    "total": 119
   }
 }
