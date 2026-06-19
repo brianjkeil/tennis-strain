@@ -1153,10 +1153,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-06-19T10:18:54.522Z",
+  "lastSync": "2026-06-19T14:53:10.108Z",
   "syncStats": {
-    "added": 6,
-    "preserved": 122,
+    "added": 0,
+    "preserved": 128,
     "total": 128
   }
 }
