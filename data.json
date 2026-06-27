@@ -1214,12 +1214,21 @@
       "duration": 93,
       "recovery": 82,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-578c6d7a-9676-44d2-a10a-db603b74acbe",
+      "date": "2026-06-27",
+      "strain": 8.4,
+      "type": null,
+      "duration": 86,
+      "recovery": 58,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-06-27T13:21:53.194Z",
+  "lastSync": "2026-06-27T19:13:04.494Z",
   "syncStats": {
-    "added": 0,
+    "added": 1,
     "preserved": 135,
-    "total": 135
+    "total": 136
   }
 }
