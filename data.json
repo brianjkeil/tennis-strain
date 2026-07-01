@@ -1261,10 +1261,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-07-01T14:23:50.376Z",
+  "lastSync": "2026-07-01T19:45:48.385Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 139,
+    "added": 0,
+    "preserved": 140,
     "total": 140
   }
 }
