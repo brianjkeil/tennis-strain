@@ -225,16 +225,26 @@ jobs:
             } catch(e) { console.log('No tags.json found.'); }
 
             const existingMap = new Map((existingData.sessions || []).map(s => [s.id, s]));
-            let added = 0, preserved = 0;
+            let added = 0, preserved = 0, updated = 0;
             sessions.forEach(s => {
               if (existingMap.has(s.id)) {
                 const existing = existingMap.get(s.id);
-                const updates = {};
-                if (!existing.duration && s.duration) updates.duration = s.duration;
-                if (s.recovery !== null && s.recovery !== undefined) updates.recovery = s.recovery;
-                if (Object.keys(updates).length > 0) {
-                  existingMap.set(s.id, { ...existing, ...updates });
+                // FIX: Always refresh WHOOP-calculated fields so edits to
+                // session start/end times in WHOOP reflect correctly.
+                // Only 'type' (user-assigned tag) is preserved from existing data.
+                const refreshed = {
+                  ...existing,
+                  strain: s.strain,
+                  duration: s.duration,
+                  recovery: s.recovery !== null && s.recovery !== undefined ? s.recovery : existing.recovery
+                };
+                // Track if anything actually changed
+                if (refreshed.strain !== existing.strain ||
+                    refreshed.duration !== existing.duration ||
+                    refreshed.recovery !== existing.recovery) {
+                  updated++;
                 }
+                existingMap.set(s.id, refreshed);
                 preserved++;
               } else {
                 existingMap.set(s.id, s);
@@ -250,9 +260,9 @@ jobs:
             fs.writeFileSync('data.json', JSON.stringify({
               sessions: merged,
               lastSync: new Date().toISOString(),
-              syncStats: { added, preserved, total: merged.length }
+              syncStats: { added, preserved, updated, total: merged.length }
             }, null, 2));
-            console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + merged.length + ' total.');
+            console.log('data.json written: ' + added + ' new, ' + preserved + ' preserved, ' + updated + ' updated, ' + merged.length + ' total.');
 
             if (Object.keys(tags).length > 0) {
               fs.writeFileSync('tags.json', JSON.stringify({}));
