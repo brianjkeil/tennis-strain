@@ -1331,13 +1331,31 @@
       "duration": 91,
       "recovery": 91,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-35be1abf-3109-4ef1-9628-d9047e365c91",
+      "date": "2026-07-09",
+      "strain": 6.2,
+      "type": null,
+      "duration": 19,
+      "recovery": 89,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-085364de-baa7-4e10-a197-05434f7b58cb",
+      "date": "2026-07-09",
+      "strain": 5.2,
+      "type": null,
+      "duration": 23,
+      "recovery": 89,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-07-09T09:28:56.665Z",
+  "lastSync": "2026-07-09T14:45:39.217Z",
   "syncStats": {
-    "added": 0,
+    "added": 2,
     "preserved": 148,
     "updated": 0,
-    "total": 148
+    "total": 150
   }
 }
