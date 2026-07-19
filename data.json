@@ -1414,10 +1414,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-07-19T02:09:07.003Z",
+  "lastSync": "2026-07-19T08:07:17.438Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 156,
+    "added": 0,
+    "preserved": 157,
     "updated": 0,
     "total": 157
   }
