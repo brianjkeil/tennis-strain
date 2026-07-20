@@ -1423,10 +1423,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-07-19T18:57:53.715Z",
+  "lastSync": "2026-07-20T02:29:34.948Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 157,
+    "added": 0,
+    "preserved": 158,
     "updated": 0,
     "total": 158
   }
