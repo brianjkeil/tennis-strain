@@ -1576,11 +1576,11 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-08-11T18:54:42.128Z",
+  "lastSync": "2026-08-12T01:23:38.503Z",
   "syncStats": {
     "added": 0,
     "preserved": 175,
-    "updated": 1,
+    "updated": 0,
     "total": 175
   }
 }
