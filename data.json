@@ -1621,10 +1621,10 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-08-15T18:20:03.985Z",
+  "lastSync": "2026-08-16T00:58:15.101Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 179,
+    "added": 0,
+    "preserved": 180,
     "updated": 0,
     "total": 180
   }
