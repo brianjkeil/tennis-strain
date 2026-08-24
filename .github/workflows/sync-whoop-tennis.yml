@@ -66,6 +66,10 @@ jobs:
             });
           }
 
+          function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+          }
+
           function get(url, token) {
             return new Promise((resolve, reject) => {
               const u = new URL(url);
@@ -84,6 +88,25 @@ jobs:
               req.on('error', reject);
               req.end();
             });
+          }
+
+          async function getWithRetry(url, token, retries = 3, delayMs = 5000) {
+            for (let attempt = 1; attempt <= retries; attempt++) {
+              try {
+                const resp = await get(url, token);
+                if (resp.status === 504 || resp.status === 502 || resp.status === 503) {
+                  console.log('Got ' + resp.status + ' on attempt ' + attempt + ' — retrying in ' + (delayMs/1000) + 's...');
+                  if (attempt < retries) await sleep(delayMs);
+                  continue;
+                }
+                return resp;
+              } catch(e) {
+                console.log('Request error on attempt ' + attempt + ': ' + e.message);
+                if (attempt < retries) await sleep(delayMs);
+                else throw e;
+              }
+            }
+            throw new Error('All ' + retries + ' attempts failed for: ' + url);
           }
 
           async function run() {
@@ -125,7 +148,7 @@ jobs:
               let url = 'https://api.prod.whoop.com/developer/v2/activity/workout?limit=25';
               if (nextToken) url += '&nextToken=' + encodeURIComponent(nextToken);
 
-              const resp = await get(url, accessToken);
+              const resp = await getWithRetry(url, accessToken);
               if (resp.status !== 200) {
                 console.error('Workout fetch failed:', JSON.stringify(resp.data));
                 process.exit(1);
@@ -154,7 +177,7 @@ jobs:
             do {
               let recUrl = 'https://api.prod.whoop.com/developer/v2/recovery?limit=25';
               if (recNextToken) recUrl += '&nextToken=' + encodeURIComponent(recNextToken);
-              const recResp = await get(recUrl, accessToken);
+              const recResp = await getWithRetry(recUrl, accessToken);
               console.log('Recovery page ' + (recPages+1) + ' status:', recResp.status);
               if (recResp.status !== 200) {
                 console.log('Recovery fetch failed:', JSON.stringify(recResp.data).substring(0,200));
