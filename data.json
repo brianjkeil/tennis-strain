@@ -1655,13 +1655,139 @@
       "duration": 98,
       "recovery": 47,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-1c552255-36f5-44d5-acc1-c2760939d9fa",
+      "date": "2026-08-20",
+      "strain": 8.2,
+      "type": null,
+      "duration": 61,
+      "recovery": 92,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-9097386a-b6d0-4b55-96f7-4958d7645395",
+      "date": "2026-08-21",
+      "strain": 11,
+      "type": null,
+      "duration": 83,
+      "recovery": 37,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ea07812e-29d8-480d-a2a7-1512d50abdb1",
+      "date": "2026-08-22",
+      "strain": 8.4,
+      "type": null,
+      "duration": 51,
+      "recovery": 60,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8030dfd2-2176-4dea-a2db-a0c6a786a7e8",
+      "date": "2026-08-22",
+      "strain": 9.7,
+      "type": null,
+      "duration": 66,
+      "recovery": 60,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-8db06c0b-16a7-47d0-b28e-d13b7c8ec889",
+      "date": "2026-08-25",
+      "strain": 12.5,
+      "type": null,
+      "duration": 107,
+      "recovery": 67,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ab7d481d-57ed-4d0d-a9d6-ddb4d5ebe546",
+      "date": "2026-08-26",
+      "strain": 10.2,
+      "type": null,
+      "duration": 80,
+      "recovery": 55,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-407a68a6-9755-42a0-8d72-422fe0d6e944",
+      "date": "2026-08-27",
+      "strain": 11.2,
+      "type": null,
+      "duration": 76,
+      "recovery": 53,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e931389f-baae-4d45-90b9-a2428c49da5e",
+      "date": "2026-08-28",
+      "strain": 11.5,
+      "type": null,
+      "duration": 59,
+      "recovery": 42,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-d173fe93-0a51-460f-8c37-2e32992da013",
+      "date": "2026-08-28",
+      "strain": 8.3,
+      "type": null,
+      "duration": 60,
+      "recovery": 42,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5b5b339f-039b-475f-bac0-f86c8bd99d8b",
+      "date": "2026-08-30",
+      "strain": 12.3,
+      "type": null,
+      "duration": 76,
+      "recovery": 55,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-35dae12b-881f-49fa-bd5e-eda3263cbd25",
+      "date": "2026-08-31",
+      "strain": 8.4,
+      "type": null,
+      "duration": 97,
+      "recovery": 51,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-67b59a2e-136f-44dd-9e49-52434191ef6c",
+      "date": "2026-09-01",
+      "strain": 11.9,
+      "type": null,
+      "duration": 144,
+      "recovery": 73,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-0106a66c-dcf0-431a-930e-b5c7a7248f65",
+      "date": "2026-09-02",
+      "strain": 6.9,
+      "type": null,
+      "duration": 20,
+      "recovery": 45,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e80fa2b7-a41f-44cb-a7d6-9fc9964fa9be",
+      "date": "2026-09-03",
+      "strain": 13.4,
+      "type": null,
+      "duration": 106,
+      "recovery": 56,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-08-20T12:35:57.598Z",
+  "lastSync": "2026-09-03T14:35:19.837Z",
   "syncStats": {
-    "added": 0,
+    "added": 14,
     "preserved": 184,
     "updated": 0,
-    "total": 184
+    "total": 198
   }
 }
