@@ -1795,7 +1795,7 @@
       "id": "whoop-api-e74dd063-c27b-40aa-ad21-152a5d0599ba",
       "date": "2026-09-04",
       "strain": 5.1,
-      "type": null,
+      "type": "doubles",
       "duration": 60,
       "recovery": 63,
       "source": "whoop-api"
@@ -1804,13 +1804,13 @@
       "id": "whoop-api-9f80c4e2-3dc5-45dc-b9e6-67a92a534c17",
       "date": "2026-09-05",
       "strain": 7,
-      "type": null,
+      "type": "doubles",
       "duration": 80,
       "recovery": 49,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-09-06T14:47:01.421Z",
+  "lastSync": "2026-09-06T19:53:05.738Z",
   "syncStats": {
     "added": 0,
     "preserved": 201,
