@@ -1970,13 +1970,22 @@
       "duration": 144,
       "recovery": 46,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-ae3b871e-64c3-4bfc-b5cc-7cd407e4998a",
+      "date": "2026-10-06",
+      "strain": 5.3,
+      "type": null,
+      "duration": 20,
+      "recovery": 62,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-06T12:37:11.098Z",
+  "lastSync": "2026-10-06T22:10:38.279Z",
   "syncStats": {
-    "added": 0,
+    "added": 1,
     "preserved": 218,
     "updated": 0,
-    "total": 219
+    "total": 220
   }
 }
