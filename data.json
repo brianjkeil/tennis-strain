@@ -2004,14 +2004,14 @@
       "strain": 0,
       "type": null,
       "duration": 55,
-      "recovery": null,
+      "recovery": 52,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-09T04:10:41.624Z",
+  "lastSync": "2026-10-09T12:26:47.613Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 221,
+    "added": 0,
+    "preserved": 222,
     "updated": 1,
     "total": 223
   }
