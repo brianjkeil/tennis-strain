@@ -2015,13 +2015,22 @@
       "duration": 71,
       "recovery": 52,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-e2f2b7c9-6844-4501-8ebb-e1e476462966",
+      "date": "2026-10-14",
+      "strain": 12.4,
+      "type": null,
+      "duration": 83,
+      "recovery": 89,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-14T16:21:26.518Z",
+  "lastSync": "2026-10-14T21:12:53.946Z",
   "syncStats": {
-    "added": 0,
+    "added": 1,
     "preserved": 223,
     "updated": 0,
-    "total": 224
+    "total": 225
   }
 }
