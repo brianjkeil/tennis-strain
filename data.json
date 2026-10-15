@@ -2021,16 +2021,16 @@
       "date": "2026-10-14",
       "strain": 12.4,
       "type": null,
-      "duration": 83,
+      "duration": 88,
       "recovery": 89,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-14T21:12:53.946Z",
+  "lastSync": "2026-10-15T02:50:03.982Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 223,
-    "updated": 0,
+    "added": 0,
+    "preserved": 224,
+    "updated": 1,
     "total": 225
   }
 }
