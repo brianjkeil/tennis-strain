@@ -2028,27 +2028,27 @@
     {
       "id": "whoop-api-18608a95-887d-4f65-8fa3-e4fe121244d2",
       "date": "2026-10-15",
-      "strain": 6.5,
+      "strain": 8.4,
       "type": null,
-      "duration": 30,
+      "duration": 63,
       "recovery": 39,
       "source": "whoop-api"
     },
     {
       "id": "whoop-api-806f9fcb-4fa5-47d9-a5a6-64ada23d82ca",
       "date": "2026-10-15",
-      "strain": 7,
+      "strain": 8.5,
       "type": null,
-      "duration": 20,
+      "duration": 64,
       "recovery": 39,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-15T20:50:32.384Z",
+  "lastSync": "2026-10-16T02:47:18.317Z",
   "syncStats": {
     "added": 0,
     "preserved": 226,
-    "updated": 0,
+    "updated": 2,
     "total": 227
   }
 }
