@@ -1594,15 +1594,6 @@
       "source": "whoop-api"
     },
     {
-      "id": "whoop-api-372a521d-089b-485f-8cc5-fbd6380a0397",
-      "date": "2026-08-14",
-      "strain": 5,
-      "type": null,
-      "duration": 20,
-      "recovery": 70,
-      "source": "whoop-api"
-    },
-    {
       "id": "whoop-api-e84ef595-c453-4d92-b11f-c77b306a3696",
       "date": "2026-08-14",
       "strain": 6.4,
@@ -1714,18 +1705,9 @@
       "id": "whoop-api-407a68a6-9755-42a0-8d72-422fe0d6e944",
       "date": "2026-08-27",
       "strain": 11.2,
-      "type": null,
+      "type": "singles",
       "duration": 76,
       "recovery": 53,
-      "source": "whoop-api"
-    },
-    {
-      "id": "whoop-api-e931389f-baae-4d45-90b9-a2428c49da5e",
-      "date": "2026-08-28",
-      "strain": 11.5,
-      "type": "singles",
-      "duration": 59,
-      "recovery": 42,
       "source": "whoop-api"
     },
     {
@@ -1813,7 +1795,7 @@
       "id": "whoop-api-baa756f3-f149-4a4e-a895-7654f56d5393",
       "date": "2026-09-08",
       "strain": 10.1,
-      "type": null,
+      "type": "singles",
       "duration": 93,
       "recovery": 94,
       "source": "whoop-api"
@@ -1876,7 +1858,7 @@
       "id": "whoop-api-b5733ef6-bea1-454f-96cf-3bd46e64199d",
       "date": "2026-09-24",
       "strain": 9.7,
-      "type": null,
+      "type": "singles",
       "duration": 59,
       "recovery": 61,
       "source": "whoop-api"
@@ -1966,7 +1948,7 @@
       "id": "whoop-api-ae3b871e-64c3-4bfc-b5cc-7cd407e4998a",
       "date": "2026-10-06",
       "strain": 7.1,
-      "type": null,
+      "type": "doubles",
       "duration": 90,
       "recovery": 62,
       "source": "whoop-api"
@@ -2020,7 +2002,7 @@
       "id": "whoop-api-18608a95-887d-4f65-8fa3-e4fe121244d2",
       "date": "2026-10-15",
       "strain": 8.4,
-      "type": null,
+      "type": "doubles",
       "duration": 63,
       "recovery": 39,
       "source": "whoop-api"
@@ -2038,7 +2020,7 @@
       "id": "whoop-api-bb6523d0-3fff-4a87-a0f2-57a1784c44b0",
       "date": "2026-10-16",
       "strain": 8.2,
-      "type": null,
+      "type": "doubles",
       "duration": 105,
       "recovery": 78,
       "source": "whoop-api"
