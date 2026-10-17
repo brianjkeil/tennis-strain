@@ -1900,15 +1900,6 @@
       "source": "whoop-api"
     },
     {
-      "id": "whoop-api-04257582-bfc0-40c9-aa38-42a30b8371f8",
-      "date": "2026-09-27",
-      "strain": 4.6,
-      "type": null,
-      "duration": 13,
-      "recovery": 90,
-      "source": "whoop-api"
-    },
-    {
       "id": "whoop-api-8e05704b-549a-4ac9-82cc-fc15e0dc3cd2",
       "date": "2026-09-27",
       "strain": 9.8,
