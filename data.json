@@ -2047,17 +2047,26 @@
       "id": "whoop-api-2532fa51-d5ad-443c-98d5-d8ee2734f37e",
       "date": "2026-10-17",
       "strain": 6.1,
-      "type": null,
+      "type": "doubles",
       "duration": 80,
+      "recovery": 40,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-b515fc6b-755a-44b8-b089-25a1b8ab2fb8",
+      "date": "2026-10-17",
+      "strain": 9.5,
+      "type": null,
+      "duration": 60,
       "recovery": 40,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-10-17T16:28:30.180Z",
+  "lastSync": "2026-10-17T19:58:26.847Z",
   "syncStats": {
-    "added": 2,
-    "preserved": 226,
-    "updated": 1,
-    "total": 228
+    "added": 1,
+    "preserved": 228,
+    "updated": 0,
+    "total": 229
   }
 }
