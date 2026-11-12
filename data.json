@@ -2222,13 +2222,40 @@
       "duration": 15,
       "recovery": 53,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-c7a10f1c-8abd-4fac-931b-cbf66b470635",
+      "date": "2026-11-12",
+      "strain": 9.1,
+      "type": null,
+      "duration": 59,
+      "recovery": 93,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-5f7310ca-57d9-48e3-a736-76b11b1c359a",
+      "date": "2026-11-12",
+      "strain": 4.7,
+      "type": null,
+      "duration": 15,
+      "recovery": 93,
+      "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-3466d178-2a63-4e7e-bb17-43a7674fb781",
+      "date": "2026-11-12",
+      "strain": 9.5,
+      "type": null,
+      "duration": 68,
+      "recovery": 93,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-11-12T14:47:33.010Z",
+  "lastSync": "2026-11-12T23:05:54.341Z",
   "syncStats": {
-    "added": 0,
+    "added": 3,
     "preserved": 247,
     "updated": 0,
-    "total": 247
+    "total": 250
   }
 }
