@@ -2316,18 +2316,18 @@
     {
       "id": "whoop-api-9d5968c7-ecd9-48a1-9f35-79373a450e1e",
       "date": "2026-11-18",
-      "strain": 4.4,
+      "strain": 5.5,
       "type": null,
-      "duration": 16,
+      "duration": 83,
       "recovery": 68,
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-11-18T14:57:35.276Z",
+  "lastSync": "2026-11-18T23:48:33.916Z",
   "syncStats": {
-    "added": 1,
-    "preserved": 257,
-    "updated": 0,
+    "added": 0,
+    "preserved": 258,
+    "updated": 1,
     "total": 258
   }
 }
