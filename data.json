@@ -2323,11 +2323,11 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-11-18T23:48:33.916Z",
+  "lastSync": "2026-11-19T05:35:21.777Z",
   "syncStats": {
     "added": 0,
     "preserved": 258,
-    "updated": 1,
+    "updated": 0,
     "total": 258
   }
 }
