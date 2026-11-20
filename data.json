@@ -2330,13 +2330,22 @@
       "duration": 61,
       "recovery": 52,
       "source": "whoop-api"
+    },
+    {
+      "id": "whoop-api-f1dc6f0a-c27a-4b26-8c6e-ac895b603885",
+      "date": "2026-11-20",
+      "strain": 8.8,
+      "type": null,
+      "duration": 57,
+      "recovery": 77,
+      "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-11-20T00:11:06.676Z",
+  "lastSync": "2026-11-20T14:46:15.554Z",
   "syncStats": {
-    "added": 0,
+    "added": 1,
     "preserved": 259,
-    "updated": 1,
-    "total": 259
+    "updated": 0,
+    "total": 260
   }
 }
