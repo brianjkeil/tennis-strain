@@ -2377,11 +2377,11 @@
       "source": "whoop-api"
     }
   ],
-  "lastSync": "2026-11-25T16:40:05.213Z",
+  "lastSync": "2026-11-26T01:27:30.606Z",
   "syncStats": {
     "added": 0,
     "preserved": 263,
-    "updated": 2,
+    "updated": 0,
     "total": 264
   }
 }
